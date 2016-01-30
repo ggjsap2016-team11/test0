@@ -24,7 +24,7 @@ static int mCount;          //カウンタ
 static float mFps;          //fps
 static const int N = 60;	//平均を取るサンプル数
 static const int FPS = 60;	//設定したFPS
-
+int GameHp = 50;
 float FpsDelayCnt;
 
 int cnt = 0;//起動時からのカウント
@@ -54,6 +54,10 @@ int NotesPattern[] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 int Opening[4];
 int OpeiningCount;
 int StageBottom;
+int YourDieH;
+int GameOverCount;
+
+
 bool Update(){
 	if( mCount == 0 ){ //1フレーム目なら時刻を記憶
 		mStartTime = GetNowCount();
@@ -103,6 +107,7 @@ void Load(){
 	Opening[1] = LoadGraph("Opening2.png");
 	Opening[2] = LoadGraph("Opening3.png");
 	Opening[3] = LoadGraph("Opening4.png");
+	YourDieH = LoadGraph("YouDie.png");
 
 }
 
@@ -308,7 +313,17 @@ void CharMove(){
 	}else{
 		num=1;
 	}
-		DrawGraph(PlayerX, PlayerY, GHandle[num], TRUE);
+
+	if (Pad & PAD_INPUT_L) {
+		GameHp--;
+	}
+
+	if (Pad & PAD_INPUT_R) {
+		GameHp++;
+	}
+
+
+	DrawGraph(PlayerX, PlayerY, GHandle[num], TRUE);
 }
 
 void OpeningUpdate() {
@@ -316,6 +331,7 @@ void OpeningUpdate() {
     if(OpeiningCount >= 660 && Pad & PAD_INPUT_4 ){
 		PlayIni();//初期化
 		SetNotes();//譜面セット
+		GameHp = 50;
 		Frame=3;//ゲーム画面に遷移                    
     }
 }
@@ -346,10 +362,28 @@ void Game(){
 	Move();
 	Draw();//描画
 	CharMove();
+
+	if (GameHp <= 0) {
+		GameOverCount = 0;
+		Frame=4;
+	}
+
+}
+
+void GameOverUpdate() {
+
+	GameOverCount++;
+	if (GameOverCount > 300) {
+	
+		Frame=5;
+	}
 }
 
 
-
+void GameOverDraw() {
+	
+	DrawGraph(0, 0, YourDieH, TRUE);
+}
 
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine, int nCmdShow ){
@@ -399,11 +433,14 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 				GameCnt++;
 				break;
 			case 4:
-				DrawFormatString(MAX_DISPLAY_SIZE_X/2-50,MAX_DISPLAY_SIZE_Y/2,GetColor( 255 , 255 , 255 ),"リザルト画面"); 
+				GameOverUpdate();
+				GameOverDraw();
 				break;
 			case 5:
-				DrawFormatString(MAX_DISPLAY_SIZE_X/2-50,MAX_DISPLAY_SIZE_Y/2,GetColor( 255 , 255 , 255 ),"ゲームオーバー画面"); 
-				break;		}
+				DrawFormatString(MAX_DISPLAY_SIZE_X/2-50,MAX_DISPLAY_SIZE_Y/2,GetColor( 255 , 255 , 255 ),"リザルト画面"); 
+				break;
+		
+		}
 		
 		ScreenFlip() ;// 裏画面の内容を表画面に反映させる
 
