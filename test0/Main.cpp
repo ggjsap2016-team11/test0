@@ -32,7 +32,7 @@ int cnt = 0;//起動時からのカウント
 int Frame=0;//画面遷移
 
 int SHandle;
-int GHandle[2];
+int GHandle[10];
 int GDrawFlag = 0;
 int BackHandle;
 
@@ -79,6 +79,16 @@ void Load(){
 	SHandle = LoadSoundMem("10MIN_120BPM_44100_16bit.wav");
 	GHandle[0] = LoadGraph("待機1.png");
 	GHandle[1] = LoadGraph("待機2.png");
+
+	GHandle[2] = LoadGraph("ActionUp_Just.png");
+	GHandle[3] = LoadGraph("ActionUp_Near.png");
+	GHandle[4] = LoadGraph("ActionRight_Just.png");
+	GHandle[5] = LoadGraph("ActionRight_Near.png");
+	GHandle[6] = LoadGraph("ActionDown_Just.png");
+	GHandle[7] = LoadGraph("ActionDown_Near.png");
+	GHandle[8] = LoadGraph("ActionLeft_Just.png");
+	GHandle[9] = LoadGraph("ActionLeft_Near.png");
+
 	BackHandle = LoadGraph("ステージ背景1.png");
 	GTitleHandle = LoadGraph("gametitle.png");
 	GTitleBgHandle = LoadGraph("gametitle_bg.png");
@@ -170,7 +180,7 @@ void Draw(){
 	} else {
 
 	}
-	DrawGraph(PlayerX, PlayerY, GHandle[GDrawFlag], TRUE);
+	//DrawGraph(PlayerX, PlayerY, GHandle[GDrawFlag], TRUE);
 
 	//fpsを表示
 	DrawFormatString(MAX_DISPLAY_SIZE_X-80,MAX_DISPLAY_SIZE_Y-20,GetColor( 255 , 255 , 255 ),"FPS %.1f",mFps); 
@@ -214,7 +224,7 @@ void Draw(){
 	DrawLine( PlayerX+PlayerSizeX , 0 , PlayerX+PlayerSizeX , MAX_DISPLAY_SIZE_Y , GetColor( 255 , 0 , 0 ) ) ;
 
 	//境界線
-	DrawLine( 0 , 340 , MAX_DISPLAY_SIZE_X , 340 , GetColor( 255 , 255 , 255 ) ) ;
+	//DrawLine( 0 , 340 , MAX_DISPLAY_SIZE_X , 340 , GetColor( 255 , 255 , 255 ) ) ;
 
 
 	
@@ -274,7 +284,23 @@ void StageSelectDraw() {
 	DrawGraph(0, 0, StageSelectHanele, TRUE);
 }
 
+void CharMove(){
+	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
+	int num;
 
+	if ( Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2 ) { 
+		num=2;
+	}else if( Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4 ){
+		num=4;
+	}else if( Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3 ){
+		num=6;
+	}else if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 ){
+		num=8;
+	}else{
+		num=1;
+	}
+		DrawGraph(PlayerX, PlayerY, GHandle[num], TRUE);
+	}
 
 
 void Game(){
@@ -286,13 +312,12 @@ void Game(){
 		Flag=FALSE;
 	}
 	
-
-	if( Key & PAD_INPUT_RIGHT ) PlayerX += 3 ;	// 右を押していたら右に進む
-	if( Key & PAD_INPUT_LEFT ) PlayerX -= 3 ;	// 左を押していたら左に進む
-	
 	Move();
 	Draw();//描画
+	CharMove();
 }
+
+
 
 
 
