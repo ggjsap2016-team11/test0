@@ -34,8 +34,8 @@ int Frame=0;//画面遷移
 int SHandle;
 int GHandle;
 int GTitleHandle;
-
-
+int StageSelectHanele;
+int PrevScene;
 int WaitTime;
 
 int GameCnt;//ゲームカウント
@@ -71,9 +71,10 @@ void Load(){
 	SHandle = LoadSoundMem("10MIN_120BPM_44100_16bit.wav");
 	GHandle = LoadGraph("待機1.png");
 	GTitleHandle = LoadGraph("gametitle.png");
+	StageSelectHanele = LoadGraph("stageSelect_base.png");
 }
 
-void Ini(){
+void PlayIni(){
 	// プレイヤーの初期位置をセット
 	PlayerX = 100 ;
 	PlayerY = 75 ;
@@ -209,6 +210,35 @@ void Draw(){
 	}
 }
 
+void TitleDraw() {
+	DrawGraph( 0 , 0, GTitleHandle, TRUE);
+}
+
+
+void TitleUpdate() {
+    int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
+    if( Pad & PAD_INPUT_4 ){  
+	    Frame = 1;
+	}
+
+}
+
+void StageSelectUpdate() {
+    int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+    if( Pad & PAD_INPUT_4 ){
+		PlayIni();//初期化
+		SetNotes();//譜面セット
+		Frame=2;//ゲーム画面に遷移                    
+    }
+}
+
+void StageSelectDraw() {
+	DrawGraph(0, 0, StageSelectHanele, TRUE);
+}
+
+
+
+
 void Game(){
 	
 	static boolean Flag=true;
@@ -256,22 +286,20 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 		int Pad;
 		switch(Frame){
 			case 0:
-				DrawGraph( 0 ,0, GTitleHandle, TRUE);
-                Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
-                if( Pad & PAD_INPUT_4 ){             //ボタンiの入力フラグが立っていたら
-					Ini();//初期化
-					SetNotes();//譜面セット
-					Frame=1;//ゲーム画面に遷移                    
-                }
+				TitleDraw();
+				TitleUpdate();
 				break;
 			case 1:
+				StageSelectUpdate();
+				StageSelectDraw();
+			case 2:
 				Game();
 				GameCnt++;
 				break;
-			case 2:
+			case 3:
 				DrawFormatString(MAX_DISPLAY_SIZE_X/2-50,MAX_DISPLAY_SIZE_Y/2,GetColor( 255 , 255 , 255 ),"リザルト画面"); 
 				break;
-			case 3:
+			case 4:
 				DrawFormatString(MAX_DISPLAY_SIZE_X/2-50,MAX_DISPLAY_SIZE_Y/2,GetColor( 255 , 255 , 255 ),"ゲームオーバー画面"); 
 				break;
 		}
@@ -285,7 +313,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 		//}
 	}
 
-	DxLib_End() ;				// ＤＸライブラリ使用の終了処理
+	DxLib_End();				// ＤＸライブラリ使用の終了処理
 
-	return 0 ;					// ソフトの終了
+	return 0;					// ソフトの終了
 }
