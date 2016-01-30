@@ -32,7 +32,10 @@ int cnt = 0;//起動時からのカウント
 int Frame=0;//画面遷移
 
 int SHandle;
-int GHandle;
+int GHandle[2];
+int GDrawFlag = 0;
+int BackHandle;
+
 int GTitleHandle;
 int GTitleBgHandle;
 int StageSelectHanele;
@@ -70,7 +73,9 @@ void Wait(){
 
 void Load(){
 	SHandle = LoadSoundMem("10MIN_120BPM_44100_16bit.wav");
-	GHandle = LoadGraph("待機1.png");
+	GHandle[0] = LoadGraph("待機1.png");
+	GHandle[1] = LoadGraph("待機2.png");
+	BackHandle = LoadGraph("ステージ背景1.png");
 	GTitleHandle = LoadGraph("gametitle.png");
 	GTitleBgHandle = LoadGraph("gametitle_bg.png");
 	StageSelectHanele = LoadGraph("stageSelect_base.png");
@@ -148,10 +153,17 @@ void Move(){
 }
 
 void Draw(){
-
+	// 背景背景
+	DrawGraph(0, 0, BackHandle, TRUE);
 	//プレイヤー描画
-	DrawGraph( PlayerX ,  PlayerY , GHandle , TRUE ) ;
+	if (cnt % 60 ==0) {
+		GDrawFlag = 0;
+	} else if(cnt % 30 == 0) {
+		GDrawFlag = 1;
+	} else {
 
+	}
+	DrawGraph(PlayerX, PlayerY, GHandle[GDrawFlag], TRUE);
 
 	//fpsを表示
 	DrawFormatString(MAX_DISPLAY_SIZE_X-80,MAX_DISPLAY_SIZE_Y-20,GetColor( 255 , 255 , 255 ),"FPS %.1f",mFps); 
