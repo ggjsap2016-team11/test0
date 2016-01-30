@@ -53,6 +53,7 @@ int MusicTime=30;//テスト用　
 int NotesPattern[] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};//テスト用
 int Opening[4];
 int OpeiningCount;
+int StageBottom;
 bool Update(){
 	if( mCount == 0 ){ //1フレーム目なら時刻を記憶
 		mStartTime = GetNowCount();
@@ -96,6 +97,7 @@ void Load(){
 	GTitleStartHandle = LoadGraph("gametitle_start_default.png");
 	GTitleStartPushHandle = LoadGraph("gametitle_start_push.png");
 	StageSelectHanele = LoadGraph("stageSelect_base.png");
+	StageBottom = LoadGraph("stage_bottom.png");
 
 	Opening[0] = LoadGraph("Opening1.png");
 	Opening[1] = LoadGraph("Opening2.png");
@@ -179,6 +181,7 @@ void Move(){
 void Draw(){
 	// 背景背景
 	DrawGraph(0, 0, BackHandle, TRUE);
+	DrawGraph(0, 0, StageBottom, TRUE);
 	//プレイヤー描画
 	if (cnt % 60 ==0) {
 		GDrawFlag = 0;
