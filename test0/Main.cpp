@@ -253,15 +253,16 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 
 		// 画面を初期化する
 		ClearDrawScreen() ;
-		
+		int Pad;
 		switch(Frame){
 			case 0:
 				DrawGraph( 0 ,0, GTitleHandle, TRUE);
-				if( CheckHitKey( KEY_INPUT_RETURN ) != 0) {
+                Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
+                if( Pad & PAD_INPUT_4 ){             //ボタンiの入力フラグが立っていたら
 					Ini();//初期化
 					SetNotes();//譜面セット
-					Frame=1;//ゲーム画面に遷移
-				}
+					Frame=1;//ゲーム画面に遷移                    
+                }
 				break;
 			case 1:
 				Game();
