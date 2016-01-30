@@ -32,9 +32,10 @@ int cnt = 0;//起動時からのカウント
 int Frame=0;//画面遷移
 
 int SHandle;
-int GHandle[10];
+int GHandle[11];
 int GDrawFlag = 0;
 int BackHandle;
+
 
 int GTitleHandle;
 int GTitleBgHandle;
@@ -87,42 +88,45 @@ void Wait(){
 
 void Load(){
 	SHandle = LoadSoundMem("10MIN_120BPM_44100_16bit.wav");
-	GHandle[0] = LoadGraph("待機1.png");
-	GHandle[1] = LoadGraph("待機2.png");
 
-	GHandle[2] = LoadGraph("ActionUp_Just.png");
-	GHandle[3] = LoadGraph("ActionUp_Near.png");
-	GHandle[4] = LoadGraph("ActionRight_Just.png");
-	GHandle[5] = LoadGraph("ActionRight_Near.png");
-	GHandle[6] = LoadGraph("ActionDown_Just.png");
-	GHandle[7] = LoadGraph("ActionDown_Near.png");
-	GHandle[8] = LoadGraph("ActionLeft_Just.png");
-	GHandle[9] = LoadGraph("ActionLeft_Near.png");
+	GHandle[0] = LoadGraph("Image/PlayerWait1.png");//待機1
+	GHandle[1] = LoadGraph("Image/PlayerWait2.png");//待機2
 
-	BackHandle = LoadGraph("ステージ背景1.png");
-	GTitleHandle = LoadGraph("gametitle.png");
-	GTitleBgHandle = LoadGraph("gametitle_bg.png");
-	GTitleStartHandle = LoadGraph("gametitle_start_default.png");
-	GTitleStartPushHandle = LoadGraph("gametitle_start_push.png");
+	GHandle[2] = LoadGraph("Image/ActionUp_Just.png");//上just
+	GHandle[3] = LoadGraph("Image/ActionUp_Near.png");//上near
+	GHandle[4] = LoadGraph("Image/ActionRight_Just.png");//右just
+	GHandle[5] = LoadGraph("Image/ActionRight_Near.png");//右near
+	GHandle[6] = LoadGraph("Image/ActionDown_Just.png");//下just
+	GHandle[7] = LoadGraph("Image/ActionDown_Near.png");//下near
+	GHandle[8] = LoadGraph("Image/ActionLeft_Just.png");//左just
+	GHandle[9] = LoadGraph("Image/ActionLeft_Near.png");//左near
+	GHandle[10] = LoadGraph("Image/miss.png");//miss
+
+	BackHandle = LoadGraph("Image/BackImage_Stage1.png");
+	StageBottom = LoadGraph("Image/stage_bottom.png");
+
+	GTitleHandle = LoadGraph("Image/TitleLogo.png");
+	GTitleBgHandle = LoadGraph("Image/BackImage_Title.png");
+	GTitleStartHandle = LoadGraph("Image/start_01.png");
+	GTitleStartPushHandle = LoadGraph("Image/start_02.png");
 	StageSelectHanele = LoadGraph("stageSelect_base.png");
-	StageBottom = LoadGraph("stage_bottom.png");
 
-	Opening[0] = LoadGraph("Opening1.png");
-	Opening[1] = LoadGraph("Opening2.png");
-	Opening[2] = LoadGraph("Opening3.png");
-	Opening[3] = LoadGraph("Opening4.png");
-	YourDieH = LoadGraph("YouDie.png");
-	danceEvalH[0] = LoadGraph("BackImage_Result3.png");
-	danceEvalH[1] = LoadGraph("BackImage_Result2.png");
-	danceEvalH[2] = LoadGraph("BackImage_Result1.png");
-	danceEvalScoreH[0] =  LoadGraph("score_bad.png");
-	danceEvalScoreH[1] =  LoadGraph("score_normal.png");
-	danceEvalScoreH[2] =  LoadGraph("score_good.png");
+	Opening[0] = LoadGraph("Image/Opening1.png");
+	Opening[1] = LoadGraph("Image/Opening2.png");
+	Opening[2] = LoadGraph("Image/Opening3.png");
+	Opening[3] = LoadGraph("Image/Opening4.png");
+	YourDieH = LoadGraph("Image/YouDie.png");
+	danceEvalH[0] = LoadGraph("Image/BackImage_Result3.png");
+	danceEvalH[1] = LoadGraph("Image/BackImage_Result2.png");
+	danceEvalH[2] = LoadGraph("Image/BackImage_Result1.png");
+	danceEvalScoreH[0] =  LoadGraph("Image/score_bad.png");
+	danceEvalScoreH[1] =  LoadGraph("Image/score_normal.png");
+	danceEvalScoreH[2] =  LoadGraph("Image/score_good.png");
 
-	CurSor[0] = LoadGraph("c_left.png");
-	CurSor[1] = LoadGraph("c_right.png");
-	CurSor[2] = LoadGraph("c_down.png");
-	CurSor[3] = LoadGraph("c_up.png");
+	CurSor[0] = LoadGraph("Image/c_left.png");
+	CurSor[1] = LoadGraph("Image/c_right.png");
+	CurSor[2] = LoadGraph("Image/c_down.png");
+	CurSor[3] = LoadGraph("Image/c_up.png");
 
 
 }
@@ -216,14 +220,8 @@ void Draw(){
 	DrawGraph(0, 0, BackHandle, TRUE);
 	DrawGraph(0, 0, StageBottom, TRUE);
 	//プレイヤー描画
-	if (cnt % 60 ==0) {
-		GDrawFlag = 0;
-	} else if(cnt % 30 == 0) {
-		GDrawFlag = 1;
-	} else {
-
-	}
-	//DrawGraph(PlayerX, PlayerY, GHandle[GDrawFlag], TRUE);
+	
+	DrawGraph(PlayerX, PlayerY, GHandle[GDrawFlag], TRUE);
 
 	//fpsを表示
 	DrawFormatString(MAX_DISPLAY_SIZE_X-80,MAX_DISPLAY_SIZE_Y-20,GetColor( 255 , 255 , 255 ),"FPS %.1f",mFps); 
@@ -311,16 +309,20 @@ void CharMove(){
 	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
 	int num;
 
+	
+	if (cnt % 60 ==0) {
+		GDrawFlag = 0;
+	} else if(cnt % 30 == 0) {
+		GDrawFlag = 1;
+	}
 	if ( Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2 ) { 
-		num=2;
+		GDrawFlag=2;
 	}else if( Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4 ){
-		num=4;
+		GDrawFlag=4;
 	}else if( Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3 ){
-		num=6;
+		GDrawFlag=6;
 	}else if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 ){
-		num=8;
-	}else{
-		num=1;
+		GDrawFlag=8;
 	}
 
 	if (Pad & PAD_INPUT_L) {
@@ -331,9 +333,6 @@ void CharMove(){
 		danceScore++;
 		GameHp++;
 	}
-
-
-	DrawGraph(PlayerX, PlayerY, GHandle[num], TRUE);
 }
 
 void OpeningUpdate() {
