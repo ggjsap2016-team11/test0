@@ -38,7 +38,11 @@ int BackHandle;
 
 int GTitleHandle;
 int GTitleBgHandle;
+int GTitleStartHandle;
+int GTitleStartPushHandle;
 int StageSelectHanele;
+int TitleChangeFlg;
+int TitleChangeCount;
 int PrevScene;
 int WaitTime;
 
@@ -78,6 +82,8 @@ void Load(){
 	BackHandle = LoadGraph("ステージ背景1.png");
 	GTitleHandle = LoadGraph("gametitle.png");
 	GTitleBgHandle = LoadGraph("gametitle_bg.png");
+	GTitleStartHandle = LoadGraph("gametitle_start_default.png");
+	GTitleStartPushHandle = LoadGraph("gametitle_start_push.png");
 	StageSelectHanele = LoadGraph("stageSelect_base.png");
 }
 
@@ -227,13 +233,29 @@ void Draw(){
 void TitleDraw() {
 	DrawGraph( 0 , 0, GTitleBgHandle, TRUE);
 	DrawGraph( 0 , 0, GTitleHandle, TRUE);
+	if (TitleChangeFlg == 0) {
+	    DrawGraph( 600, 375, GTitleStartHandle, TRUE);
+	} else {
+		if (TitleChangeCount % 8 >= 5) {
+		    DrawGraph( 600, 375, GTitleStartPushHandle, TRUE);
+		}
+	}
 }
 
 
 void TitleUpdate() {
     int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
-    if( Pad & PAD_INPUT_4 ){  
-	    Frame = 1;
+    if (TitleChangeFlg == 0 && (Pad & PAD_INPUT_4) ) {  
+		TitleChangeFlg = 1;
+	}
+
+	if (TitleChangeFlg == 1) {
+		if (TitleChangeCount >= 120) {
+			Frame = 1;
+			TitleChangeCount = 0;
+		} else {
+			TitleChangeCount++;
+		}
 	}
 
 }
@@ -283,6 +305,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 		 return -1;				// エラーが起きたら直ちに終了
 	}
 
+	TitleChangeFlg = 0;
+	TitleChangeCount = 0;
+
 	// 描画先画面を裏画面にセット
 	SetDrawScreen( DX_SCREEN_BACK ) ;
 
@@ -307,6 +332,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 			case 1:
 				StageSelectUpdate();
 				StageSelectDraw();
+				break;
 			case 2:
 				Game();
 				GameCnt++;
