@@ -34,6 +34,7 @@ int Frame=0;//‰æ–Ê‘JˆÚ
 int SHandle;
 int GHandle;
 int GTitleHandle;
+int GTitleBgHandle;
 int StageSelectHanele;
 int PrevScene;
 int WaitTime;
@@ -71,6 +72,7 @@ void Load(){
 	SHandle = LoadSoundMem("10MIN_120BPM_44100_16bit.wav");
 	GHandle = LoadGraph("‘Ò‹@1.png");
 	GTitleHandle = LoadGraph("gametitle.png");
+	GTitleBgHandle = LoadGraph("gametitle_bg.png");
 	StageSelectHanele = LoadGraph("stageSelect_base.png");
 }
 
@@ -211,6 +213,7 @@ void Draw(){
 }
 
 void TitleDraw() {
+	DrawGraph( 0 , 0, GTitleBgHandle, TRUE);
 	DrawGraph( 0 , 0, GTitleHandle, TRUE);
 }
 
