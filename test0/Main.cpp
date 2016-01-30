@@ -62,6 +62,14 @@ int danceScore;
 int danceEvalH[3];
 int danceEvalScoreH[3];
 int CurSor[4];
+int selectStageNumber;
+int selectStageDif;
+int selectMode;
+int selectModeY[3] = {145, 260, 365};
+int selectChangeCount = 0;
+int stageBackH[2];
+int selectModeH[3];
+int selectCursorH;
 
 bool Update(){
 	if( mCount == 0 ){ //1ÉtÉåÅ[ÉÄñ⁄Ç»ÇÁéûçèÇãLâØ
@@ -109,7 +117,7 @@ void Load(){
 	GTitleBgHandle = LoadGraph("Image/BackImage_Title.png");
 	GTitleStartHandle = LoadGraph("Image/start_01.png");
 	GTitleStartPushHandle = LoadGraph("Image/start_02.png");
-	StageSelectHanele = LoadGraph("stageSelect_base.png");
+	StageSelectHanele = LoadGraph("Image/stageSelect.png");
 
 	Opening[0] = LoadGraph("Image/Opening1.png");
 	Opening[1] = LoadGraph("Image/Opening2.png");
@@ -127,6 +135,14 @@ void Load(){
 	CurSor[1] = LoadGraph("Image/c_right.png");
 	CurSor[2] = LoadGraph("Image/c_down.png");
 	CurSor[3] = LoadGraph("Image/c_up.png");
+
+	stageBackH[0] = LoadGraph("Image/BackImage_Stage1.png");
+	stageBackH[1] = LoadGraph("Image/BackImage_Stage2.png");
+	selectCursorH = LoadGraph("Image/cursor.png");
+
+	selectModeH[0] = LoadGraph("Image/stage1.png");
+	selectModeH[1] = LoadGraph("Image/stage2.png");
+	selectModeH[2] = LoadGraph("Image/stage0.png");
 
 
 }
@@ -217,7 +233,7 @@ void Move(){
 
 void Draw(){
 	// îwåiîwåi
-	DrawGraph(0, 0, BackHandle, TRUE);
+	DrawGraph(0, 0, stageBackH[selectStageDif], TRUE);
 	DrawGraph(0, 0, StageBottom, TRUE);
 	//ÉvÉåÉCÉÑÅ[ï`âÊ
 	
@@ -293,17 +309,69 @@ void TitleUpdate() {
 
 }
 
+void StageSelectKey() {
+	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //ì¸óÕèÛë‘ÇPadÇ…äiî[
+
+	if (selectChangeCount == 0 && Pad & PAD_INPUT_UP) { 
+		selectMode--;
+		if (selectMode < 0) {
+			selectMode = 0;
+		}
+
+		selectChangeCount = 30;
+	}
+	if( Pad & PAD_INPUT_RIGHT){
+	}
+	if(selectChangeCount == 0 && Pad & PAD_INPUT_DOWN){
+		selectMode++;
+		if (selectMode > 2) {
+			selectMode = 2;
+		}
+		selectChangeCount = 30;
+
+	}
+	
+	if( Pad & PAD_INPUT_LEFT){
+	}
+
+	selectChangeCount--;
+	if (selectChangeCount < 0) {
+		selectChangeCount = 0;
+	}
+
+
+	if ( Pad & PAD_INPUT_4) {
+		switch(selectMode) {
+			case 0:
+				Frame = 2;
+				selectStageDif = 0;
+				break;
+			case 1:
+				selectStageDif = 1;
+				Frame =2;
+				break;
+			case 2:
+				Frame = 0;
+				break;
+		}
+
+	}
+
+
+}
+
 void StageSelectUpdate() {
-    int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-    if( Pad & PAD_INPUT_4 ){
-		OpeiningCount = 0;
-		Frame=2;//ÉQÅ[ÉÄâÊñ Ç…ëJà⁄                    
-    }
+	StageSelectKey();
 }
 
 void StageSelectDraw() {
 	DrawGraph(0, 0, StageSelectHanele, TRUE);
+	DrawGraph(125, selectModeY[selectMode]+15, selectCursorH, TRUE);
+	for (int i = 0; i < 3; i++) {
+		DrawGraph(225, selectModeY[i], selectModeH[i], TRUE);
+	}
 }
+
 
 void CharMove(){
 	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //ì¸óÕèÛë‘ÇPadÇ…äiî[
