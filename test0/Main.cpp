@@ -51,7 +51,8 @@ int GameCnt;//ゲームカウント
 int MusicTime=30;//テスト用　
 
 int NotesPattern[] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};//テスト用
-
+int Opening[4];
+int OpeiningCount;
 bool Update(){
 	if( mCount == 0 ){ //1フレーム目なら時刻を記憶
 		mStartTime = GetNowCount();
@@ -95,6 +96,12 @@ void Load(){
 	GTitleStartHandle = LoadGraph("gametitle_start_default.png");
 	GTitleStartPushHandle = LoadGraph("gametitle_start_push.png");
 	StageSelectHanele = LoadGraph("stageSelect_base.png");
+
+	Opening[0] = LoadGraph("Opening1.png");
+	Opening[1] = LoadGraph("Opening2.png");
+	Opening[2] = LoadGraph("Opening3.png");
+	Opening[3] = LoadGraph("Opening4.png");
+
 }
 
 void PlayIni(){
@@ -274,8 +281,7 @@ void TitleUpdate() {
 void StageSelectUpdate() {
     int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
     if( Pad & PAD_INPUT_4 ){
-		PlayIni();//初期化
-		SetNotes();//譜面セット
+		OpeiningCount = 0;
 		Frame=2;//ゲーム画面に遷移                    
     }
 }
@@ -300,7 +306,29 @@ void CharMove(){
 		num=1;
 	}
 		DrawGraph(PlayerX, PlayerY, GHandle[num], TRUE);
+}
+
+void OpeningUpdate() {
+    int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+    if(OpeiningCount >= 660 && Pad & PAD_INPUT_4 ){
+		PlayIni();//初期化
+		SetNotes();//譜面セット
+		Frame=3;//ゲーム画面に遷移                    
+    }
+}
+
+void OpeningDraw() {
+	OpeiningCount++;
+	if (OpeiningCount >= 1 && OpeiningCount != 0) {
+		int OpeiningCountFrame = (OpeiningCount / 120); 
+		if ((OpeiningCount / 120) > 3) {
+			OpeiningCountFrame = 3;
+		}
+		DrawGraph(0, 0, Opening[OpeiningCountFrame], TRUE);
+	} else {
+		DrawGraph(0, 0, Opening[0], TRUE);
 	}
+}
 
 
 void Game(){
@@ -360,16 +388,19 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 				StageSelectDraw();
 				break;
 			case 2:
+				OpeningUpdate();
+				OpeningDraw();
+				break;
+			case 3:
 				Game();
 				GameCnt++;
 				break;
-			case 3:
+			case 4:
 				DrawFormatString(MAX_DISPLAY_SIZE_X/2-50,MAX_DISPLAY_SIZE_Y/2,GetColor( 255 , 255 , 255 ),"リザルト画面"); 
 				break;
-			case 4:
+			case 5:
 				DrawFormatString(MAX_DISPLAY_SIZE_X/2-50,MAX_DISPLAY_SIZE_Y/2,GetColor( 255 , 255 , 255 ),"ゲームオーバー画面"); 
-				break;
-		}
+				break;		}
 		
 		ScreenFlip() ;// 裏画面の内容を表画面に反映させる
 
