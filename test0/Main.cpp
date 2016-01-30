@@ -70,6 +70,10 @@ int selectChangeCount = 0;
 int stageBackH[2];
 int selectModeH[3];
 int selectCursorH;
+int resultMenu[3];
+int resultMenuY[3] = {335, 400, 470};
+int resultSelectMenu = 0;
+int selectResultCount = 0;
 
 bool Update(){
 	if( mCount == 0 ){ //1フレーム目なら時刻を記憶
@@ -143,6 +147,11 @@ void Load(){
 	selectModeH[0] = LoadGraph("Image/stage1.png");
 	selectModeH[1] = LoadGraph("Image/stage2.png");
 	selectModeH[2] = LoadGraph("Image/stage0.png");
+
+
+	resultMenu[0] = LoadGraph("Image/result_retry.png");
+	resultMenu[1] =  LoadGraph("Image/result_stage.png");
+	resultMenu[2] = LoadGraph("Image/result_title.png");
 
 
 }
@@ -340,7 +349,7 @@ void StageSelectKey() {
 	}
 
 
-	if ( Pad & PAD_INPUT_4) {
+	if (selectChangeCount == 0 && Pad & PAD_INPUT_4) {
 		switch(selectMode) {
 			case 0:
 				Frame = 2;
@@ -454,7 +463,8 @@ void GameOverUpdate() {
 
 	GameOverCount++;
 	if (GameOverCount > 300) {
-	
+		resultSelectMenu = 0;
+		selectResultCount = 0;
 		Frame=5;
 	}
 }
@@ -467,12 +477,68 @@ void GameOverDraw() {
 
 void ResultUpdate() {
 
+	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
+
+	if (selectResultCount == 0 && Pad & PAD_INPUT_UP) { 
+		resultSelectMenu--;
+		if (resultSelectMenu < 0) {
+			resultSelectMenu = 0;
+		}
+
+		selectResultCount = 30;
+	}
+	if(selectResultCount == 0 && Pad & PAD_INPUT_DOWN){
+		resultSelectMenu++;
+		if (resultSelectMenu > 2) {
+			resultSelectMenu = 2;
+		}
+		selectResultCount = 30;
+
+	}
+	
+	selectResultCount--;
+	if (selectResultCount < 0) {
+		selectResultCount = 0;
+	}
+
+
+	if ( Pad & PAD_INPUT_4) {
+		switch(resultSelectMenu) {
+			case 0:
+				PlayIni();//初期化
+				SetNotes();//譜面セット
+				GameHp = 50;
+				danceeVal = 0;
+				danceScore = 0;
+				Frame=3;//ゲーム画面に遷移                    
+				break;
+			case 1:
+				Frame =1;
+				OpeiningCount = 0;
+				selectChangeCount = 30;
+				break;
+			case 2:
+				Frame = 0;
+				OpeiningCount = 0;
+				break;
+		}
+
+	}
+
+
 }
 
 void ResultDraw() {
 
 	DrawGraph(0, 0, danceEvalH[danceeVal], TRUE);
 	DrawGraph(0, 0, danceEvalScoreH[danceeVal], TRUE);
+	for (int i = 0; i < 3; i++) {
+		int resultX = -30;
+		if (resultSelectMenu == i) {
+			resultX = 0;
+		}
+		DrawGraph(resultX, resultMenuY[i], resultMenu[i], TRUE);
+	}
 }
 
 
