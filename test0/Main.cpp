@@ -33,6 +33,7 @@ int Frame=0;//画面遷移
 
 int SHandle;
 int GHandle;
+int GTitleHandle;
 
 
 int WaitTime;
@@ -67,8 +68,9 @@ void Wait(){
 }
 
 void Load(){
-	SHandle = LoadSoundMem( "10MIN_120BPM_44100_16bit.wav" ) ;
-	GHandle = LoadGraph( "待機1.png" ) ;
+	SHandle = LoadSoundMem("10MIN_120BPM_44100_16bit.wav");
+	GHandle = LoadGraph("待機1.png");
+	GTitleHandle = LoadGraph("gametitle.png");
 }
 
 void Ini(){
@@ -254,7 +256,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 		
 		switch(Frame){
 			case 0:
-				DrawFormatString(MAX_DISPLAY_SIZE_X/2-50,MAX_DISPLAY_SIZE_Y/2,GetColor( 255 , 255 , 255 ),"タイトル画面");
+				DrawGraph( 0 ,0, GTitleHandle, TRUE);
 				if( CheckHitKey( KEY_INPUT_RETURN ) != 0) {
 					Ini();//初期化
 					SetNotes();//譜面セット
