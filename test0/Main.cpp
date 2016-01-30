@@ -114,7 +114,7 @@ void PlayIni(){
 
 void SetNotes(){
 	int n;
-	int FirstFlag = TRUE;
+	boolean FirstFlag = TRUE;
 	//ノーツ発生
 	for(int k=0;k<sizeof NotesPattern/sizeof(int);k++){
 
@@ -135,6 +135,7 @@ void SetNotes(){
 
 				if(FirstFlag){
 					Hit[ n ] = 2;//判定ノーツ
+					FirstFlag = FALSE;
 				}else{
 					Hit[ n ] = 1;
 				}
