@@ -56,7 +56,11 @@ int OpeiningCount;
 int StageBottom;
 int YourDieH;
 int GameOverCount;
-
+int danceeVal;
+int danceScore;
+int danceEvalH[3];
+int danceEvalScoreH[3];
+int CurSor[4];
 
 bool Update(){
 	if( mCount == 0 ){ //1フレーム目なら時刻を記憶
@@ -108,6 +112,30 @@ void Load(){
 	Opening[2] = LoadGraph("Opening3.png");
 	Opening[3] = LoadGraph("Opening4.png");
 	YourDieH = LoadGraph("YouDie.png");
+	danceEvalH[0] = LoadGraph("BackImage_Result3.png");
+	danceEvalH[1] = LoadGraph("BackImage_Result2.png");
+	danceEvalH[2] = LoadGraph("BackImage_Result1.png");
+	danceEvalScoreH[0] =  LoadGraph("score_bad.png");
+	danceEvalScoreH[1] =  LoadGraph("score_normal.png");
+	danceEvalScoreH[2] =  LoadGraph("score_good.png");
+
+	CurSor[0] = LoadGraph("c_left.png");
+	CurSor[1] = LoadGraph("c_right.png");
+	CurSor[2] = LoadGraph("c_down.png");
+	CurSor[3] = LoadGraph("c_up.png");
+
+
+}
+
+
+void setDanceEval() {
+	if (danceScore > 100) {
+		danceeVal = 2;
+	} else if (danceScore > 50) {
+		danceeVal = 1;
+	} else {
+		danceeVal = 0;
+	}
 
 }
 
@@ -210,39 +238,20 @@ void Draw(){
 	for(int j = 0 ; j < MAX_NOTES ; j ++ ){
 		// ノーツデータが有効な時のみ描画
 		if( Notes[j] == 1 ) {
-			DrawBox( NotesX[j] + FpsDelayCnt*10 , NotesY[j] ,NotesX[j] + NotesSizeX+FpsDelayCnt*10 , NotesY[j] + NotesSizeY , GetColor( 255 , 255 , 255 ) , TRUE ) ;
+			DrawGraph( NotesX[j] + FpsDelayCnt*10 , NotesY[j] , CurSor[j % 4] , TRUE);
 		
 			if((CheckHitKey(KEY_INPUT_SPACE) != 0) && ( PlayerX < NotesX[j] ) && ( PlayerX + PlayerSizeX > NotesX[j] )){
 
-				//判定描画
-				DrawLine( PlayerX , 0 , PlayerX , MAX_DISPLAY_SIZE_Y , GetColor( 255 , 255 , 255 ) ) ;
-				DrawLine( PlayerX+PlayerSizeX , 0 , PlayerX+PlayerSizeX , MAX_DISPLAY_SIZE_Y , GetColor( 255 , 255 , 255 ) ) ;
 
-				//プレイヤー描画
-				//DrawBox( PlayerX , PlayerY , PlayerX + PlayerSizeX , PlayerY + PlayerSizeY, GetColor( 0 , 0 , 255 ) , TRUE ) ;
 			}else if(CheckHitKey(KEY_INPUT_SPACE) != 0 && ( PlayerX > NotesX[j]+NotesSizeX+50 ) && ( PlayerX + PlayerSizeX < NotesX[j] +50)){
-				//DrawBox( PlayerX , PlayerY , PlayerX + PlayerSizeX , PlayerY + PlayerSizeY, GetColor( 255 , 0 , 0 ) , TRUE ) ;
 			}
 		}else{
-			//DrawBox( PlayerX , PlayerY , PlayerX + PlayerSizeX , PlayerY + PlayerSizeY, GetColor( 255 , 255 , 255 ) , TRUE ) ;
 		}
 	}
-
-	/*for(int j = 0 ; j < MAX_NOTES ; j ++ ){
-		if(PlayerX+PlayerSizeX == Hit[j]){
-			Hit[j]
-			DrawLine( PlayerX+PlayerSizeX , 0 , PlayerX+PlayerSizeX , MAX_DISPLAY_SIZE_Y , GetColor( 0 , 0 , 255 ) ) ;
-		}*/
 
 
 	//右判定　テスト用
 	DrawLine( PlayerX+PlayerSizeX , 0 , PlayerX+PlayerSizeX , MAX_DISPLAY_SIZE_Y , GetColor( 255 , 0 , 0 ) ) ;
-
-	//境界線
-	//DrawLine( 0 , 340 , MAX_DISPLAY_SIZE_X , 340 , GetColor( 255 , 255 , 255 ) ) ;
-
-
-	
 
 	//経過時間を表示
 	DrawFormatString(MAX_DISPLAY_SIZE_X-50,0,GetColor( 255 , 255 , 255 ),"%d 秒",GameCnt/60); 
@@ -319,6 +328,7 @@ void CharMove(){
 	}
 
 	if (Pad & PAD_INPUT_R) {
+		danceScore++;
 		GameHp++;
 	}
 
@@ -332,6 +342,8 @@ void OpeningUpdate() {
 		PlayIni();//初期化
 		SetNotes();//譜面セット
 		GameHp = 50;
+		danceeVal = 0;
+		danceScore = 0;
 		Frame=3;//ゲーム画面に遷移                    
     }
 }
@@ -365,6 +377,7 @@ void Game(){
 
 	if (GameHp <= 0) {
 		GameOverCount = 0;
+		setDanceEval();
 		Frame=4;
 	}
 
@@ -383,6 +396,16 @@ void GameOverUpdate() {
 void GameOverDraw() {
 	
 	DrawGraph(0, 0, YourDieH, TRUE);
+}
+
+void ResultUpdate() {
+
+}
+
+void ResultDraw() {
+
+	DrawGraph(0, 0, danceEvalH[danceeVal], TRUE);
+	DrawGraph(0, 0, danceEvalScoreH[danceeVal], TRUE);
 }
 
 
@@ -437,7 +460,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 				GameOverDraw();
 				break;
 			case 5:
-				DrawFormatString(MAX_DISPLAY_SIZE_X/2-50,MAX_DISPLAY_SIZE_Y/2,GetColor( 255 , 255 , 255 ),"リザルト画面"); 
+				ResultUpdate();
+				ResultDraw();
 				break;
 		
 		}
