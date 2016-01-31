@@ -93,7 +93,8 @@ int PowerBarHandle;
 int LevelHandle[6];
 int RBaseHandle;
 int SHandle[2];
-
+int staffRollH[8];
+int StaffRollCount;
 
 bool Update(){
 	if( mCount == 0 ){ //1ƒtƒŒ[ƒ€–Ú‚È‚çŽž‚ð‹L‰¯
@@ -199,6 +200,18 @@ void Load(){
 	//‹È	
 	SHandle[0] = LoadSoundMem("Sound/GGJ_music1@BPM120.wav");
 	SHandle[1] = LoadSoundMem("Sound/GGJ_music2 completed BPM135.wav");
+
+	staffRollH[0] = LoadGraph("Image/staffroll_1.png");
+	staffRollH[1] = LoadGraph("Image/staffroll_2.png");
+	staffRollH[2] = LoadGraph("Image/staffroll_3.png");
+	staffRollH[3] = LoadGraph("Image/staffroll_4.png");
+	staffRollH[4] = LoadGraph("Image/staffroll_5.png");
+	staffRollH[5] = LoadGraph("Image/staffroll_6.png");
+	staffRollH[6] = LoadGraph("Image/staffroll_7.png");
+	staffRollH[7] = LoadGraph("Image/staffroll_8.png");
+
+
+
 
 }
 
@@ -350,9 +363,15 @@ void TitleDraw() {
 
 
 void TitleUpdate() {
-    int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //“ü—Íó‘Ô‚ðPad‚ÉŠi”[
+
+	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //“ü—Íó‘Ô‚ðPad‚ÉŠi”[
     if (TitleChangeFlg == 0 && (Pad & PAD_INPUT_4) ) {  
 		TitleChangeFlg = 1;
+	}
+
+	if (Pad & PAD_INPUT_L) {
+		StaffRollCount = 0;
+		Frame = 6;
 	}
 
 	if (TitleChangeFlg == 1) {
@@ -687,6 +706,33 @@ void ResultDraw() {
 	}
 }
 
+void StaffRollUpdate() {
+
+	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1);        //“ü—Íó‘Ô‚ðPad‚ÉŠi”[
+
+	if (Pad & PAD_INPUT_4) { 
+		Frame = 0;
+		OpeiningCount = 0;
+	}
+}
+
+
+void StaffRollDraw() {
+	StaffRollCount++;
+	if (StaffRollCount >= 1 && StaffRollCount != 0) {
+		int StaffRollCountFrame = (StaffRollCount / 120); 
+		if (StaffRollCountFrame > 7) {
+			StaffRollCountFrame = 7;
+		}
+		DrawGraph(0, 0, staffRollH[StaffRollCountFrame], TRUE);
+	} else {
+		DrawGraph(0, 0, staffRollH[0], TRUE);
+	}
+
+}
+
+
+
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine, int nCmdShow ){
 	DWORD tick;
@@ -741,6 +787,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 			case 5:
 				ResultUpdate();
 				ResultDraw();
+				break;
+			case 6:
+				StaffRollUpdate();
+				StaffRollDraw();
 				break;
 		
 		}
