@@ -4,7 +4,7 @@
 int Key = -1 ;
 
 // ノーツの最大数
-#define MAX_NOTES 100
+#define MAX_NOTES 300
 
 //画面サイズ
 #define MAX_DISPLAY_SIZE_X 960
@@ -24,14 +24,14 @@ static int mCount;          //カウンタ
 static float mFps;          //fps
 static const int N = 60;	//平均を取るサンプル数
 static const int FPS = 60;	//設定したFPS
-int GameHp = 50;
+static int GameHp = 50;
 float FpsDelayCnt;
 
 int cnt = 0;//起動時からのカウント
 
 int Frame=0;//画面遷移
 
-int SHandle;
+
 int GHandle[11];
 int GDrawFlag = 0;
 int BackHandle;
@@ -51,8 +51,10 @@ int GameCnt;//ゲームカウント
 
 int MusicTime=30;//テスト用　
 
-int NotesPattern[] = {1,1,1,1,1,1,1,1,3,2,2,2,2,1,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,1};//テスト用
-int JudgePattern[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int NotesPattern[] = {1,0,1,3,1,0,1,1,0,2,2,2,2,1,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,3,1,0,1,1,0,2,2,2,2,1,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+,1,0,1,3,1,0,1,1,0,2,2,2,2,1,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,3,1,0,1,1,0,2,2,2,2,1,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,-1};//テスト用
+int JudgePattern[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int Opening[4];
 int OpeiningCount;
 int StageBottom;
@@ -77,10 +79,21 @@ const int Tama_w =40;
 const int BorderJust = 20;
 const int BorderNear = 50;
 const int BorderMiss = 100;
+int DecisionEffect[3];//
+int EffectFlag = 4;//
+int EffectSizeHalf = 75;//
+int EffectTimer =0;//
 int resultMenu[3];
 int resultMenuY[3] = {335, 400, 470};
 int resultSelectMenu = 0;
 int selectResultCount = 0;
+int EffectHandle[3];
+int GameHandle[2];
+int PowerBarHandle;
+int LevelHandle[6];
+int RBaseHandle;
+int SHandle[2];
+
 
 bool Update(){
 	if( mCount == 0 ){ //1フレーム目なら時刻を記憶
@@ -106,7 +119,7 @@ void Wait(){
 }
 
 void Load(){
-	SHandle = LoadSoundMem("10MIN_120BPM_44100_16bit.wav");
+
 
 	GHandle[0] = LoadGraph("Image/PlayerWait1.png");//待機1
 	GHandle[1] = LoadGraph("Image/PlayerWait2.png");//待機2
@@ -120,6 +133,10 @@ void Load(){
 	GHandle[8] = LoadGraph("Image/ActionLeft_Just.png");//左just
 	GHandle[9] = LoadGraph("Image/ActionLeft_Near.png");//左near
 	GHandle[10] = LoadGraph("Image/miss.png");//miss
+
+	DecisionEffect[0]= LoadGraph("Image/Effect_Just.png");//
+	DecisionEffect[1]= LoadGraph("Image/Effect_Near.png");//
+	DecisionEffect[2]= LoadGraph("Image/Effect_Miss.png");//
 
 	BackHandle = LoadGraph("Image/BackImage_Stage1.png");
 	StageBottom = LoadGraph("Image/stage_bottom.png");
@@ -161,14 +178,35 @@ void Load(){
 	resultMenu[1] =  LoadGraph("Image/result_stage.png");
 	resultMenu[2] = LoadGraph("Image/result_title.png");
 
+	EffectHandle[0] = LoadGraph("Image/Effect_Just.png");
+	EffectHandle[1] = LoadGraph("Image/Effect_Miss.png");
+	EffectHandle[2] = LoadGraph("Image/Effect_Near.png");
+
+	GameHandle[0] = LoadGraph("Image/gameClear.png");
+	GameHandle[1] = LoadGraph("Image/gameOver.png");
+	
+	PowerBarHandle = LoadGraph("Image/HitPointBar.png");
+	
+	LevelHandle[0] = LoadGraph("Image/Effect_Just.png");
+	LevelHandle[1] = LoadGraph("Image/result_title.png");
+	LevelHandle[2] = LoadGraph("Image/result_title.png");
+	LevelHandle[3] = LoadGraph("Image/result_title.png");
+	LevelHandle[4] = LoadGraph("Image/result_title.png");
+	LevelHandle[5] = LoadGraph("Image/result_title.png");
+	
+	RBaseHandle = LoadGraph("Image/result_title.png");
+
+	//曲	
+	SHandle[0] = LoadSoundMem("Sound/GGJ_music1　BPM120.wav");
+	SHandle[1] = LoadSoundMem("Sound/GGJ_music2 completed BPM135.wav");
 
 }
 
 
 void setDanceEval() {
-	if (danceScore > 100) {
+	if (GameHp > 80) {
 		danceeVal = 2;
-	} else if (danceScore > 50) {
+	} else if (GameHp > 30) {
 		danceeVal = 1;
 	} else {
 		danceeVal = 0;
@@ -181,7 +219,7 @@ void SetNotes(){
 	for(int k=0; k <sizeof NotesPattern/sizeof(int) ;k++){
 		if(NotesPattern[k] != 0){
 				// ショットの位置を設定
-				NotesX[ k ] = MAX_DISPLAY_SIZE_X + k*(10*FPS)+NotesSizeX ;
+				NotesX[ k ] = MAX_DISPLAY_SIZE_X -60+ k*(5*FPS) ;
 				NotesY[ k ] = 400 ;
 				// ノーツデータを使用中にセット
 				Notes[k] = NotesPattern[k];
@@ -262,6 +300,15 @@ void Draw(){
 	}
 	DrawFormatString(MAX_DISPLAY_SIZE_X-180,MAX_DISPLAY_SIZE_Y-60,GetColor( 255 , 255 , 255 ),"FPSD %f",FpsDelayCnt); 
 
+	if(EffectFlag != 4 && EffectTimer <=10){//
+		DrawGraph((PlayerX+PlayerSizeX/2) - EffectSizeHalf,365,DecisionEffect[EffectFlag],TRUE);//
+		EffectTimer++;//
+		if(EffectTimer > 10){//
+			EffectTimer = 0;//
+			EffectFlag = 4;//
+		}//
+	}//
+
 	// ノーツを描画する
 	for(int j = 0 ; j < MAX_NOTES ; j ++ ){
 		// ノーツデータが有効な時のみ描画
@@ -276,10 +323,6 @@ void Draw(){
 		}else{
 		}
 	}
-
-
-	//右判定　テスト用
-	DrawLine( PlayerX+PlayerSizeX , 0 , PlayerX+PlayerSizeX , MAX_DISPLAY_SIZE_Y , GetColor( 255 , 0 , 0 ) ) ;
 
 	//経過時間を表示
 	DrawFormatString(MAX_DISPLAY_SIZE_X-50,0,GetColor( 255 , 255 , 255 ),"%d 秒",GameCnt/60); 
@@ -392,6 +435,7 @@ void CharacterMove(int ComandNumber,int ObjectNumber)
 	Notes[ObjectNumber] = 0;
 	NotesX[ObjectNumber] = 1000;
 	g_judgenumber++;
+	cnt = 0;
 
 }
 
@@ -402,6 +446,7 @@ void CharMove(){
 	
 	if (cnt % 60 ==0) {
 		GDrawFlag = 0;
+		cnt = 0;
 	} else if(cnt % 30 == 0) {
 		GDrawFlag = 1;
 	}
@@ -416,15 +461,18 @@ void CharMove(){
 				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
 				{
 					CharacterMove(2,j);		
+					EffectFlag = 0;//
 					GameHp++;
 				}
 				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
 				{
 					CharacterMove(3,j);		
+					EffectFlag = 1;//
 				}
 				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
 				{
 					CharacterMove(10,j);
+					EffectFlag = 2;//
 					GameHp--;
 				}
 			}
@@ -434,15 +482,18 @@ void CharMove(){
 				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
 				{
 					CharacterMove(4,j);		
+					EffectFlag = 0;//
 					GameHp++;
 					}
 					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
 					{
 					CharacterMove(5,j);		
+					EffectFlag = 1;//
 					}
 					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
 					{
 					CharacterMove(10,j);
+					EffectFlag = 2;//
 					GameHp--;
 					}			
 			}
@@ -452,15 +503,18 @@ void CharMove(){
 				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
 				{
 					CharacterMove(6,j);	
+					EffectFlag = 0;//
 					GameHp++;
 				}
 				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
 				{
 					CharacterMove(7,j);		
+					EffectFlag = 1;//
 				}
 				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
 				{
 					CharacterMove(10,j);
+					EffectFlag = 2;//
 					GameHp--;
 				}			
 			}
@@ -469,20 +523,29 @@ void CharMove(){
 			if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 && NotesPattern[j] == 4){
 				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
 				{
-					CharacterMove(8,j);		
+					CharacterMove(8,j);	
+					EffectFlag = 0;//
 					GameHp++;
 				}
 				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
 				{
-					CharacterMove(9,j);		
+					CharacterMove(9,j);	
+					EffectFlag = 1;//
 				}
 				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
 				{
 					CharacterMove(10,j);
+					EffectFlag = 2;//
 					GameHp--;
 				}			
 			}
-			break;}
+			break;
+			default:
+				Frame =5;
+				break;
+
+
+	}
 	}
 
 	if (Pad & PAD_INPUT_L) {
@@ -526,7 +589,7 @@ void Game(){
 	static boolean Flag=true;
 
 	if(Flag){
-		PlaySoundMem( SHandle , DX_PLAYTYPE_BACK ,FALSE) ;
+		PlaySoundMem( SHandle[0] , DX_PLAYTYPE_BACK ) ;
 		Flag=FALSE;
 	}
 	
