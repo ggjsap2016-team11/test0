@@ -51,7 +51,8 @@ int GameCnt;//ゲームカウント
 
 int MusicTime=30;//テスト用　
 
-int NotesPattern[] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};//テスト用
+int NotesPattern[] = {1,1,1,1,1,1,1,1,3,2,2,2,2,1,4,4,1,1,1,1,1,1,1,1,1,1,1,1,1,1};//テスト用
+int JudgePattern[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int Opening[4];
 int OpeiningCount;
 int StageBottom;
@@ -61,7 +62,7 @@ int danceeVal;
 int danceScore;
 int danceEvalH[3];
 int danceEvalScoreH[3];
-int CurSor[4];
+int CurSor[5];
 int selectStageNumber;
 int selectStageDif;
 int selectMode;
@@ -70,6 +71,12 @@ int selectChangeCount = 0;
 int stageBackH[2];
 int selectModeH[3];
 int selectCursorH;
+int g_judgenumber;
+const int Tama_h =40;
+const int Tama_w =40;
+const int BorderJust = 20;
+const int BorderNear = 50;
+const int BorderMiss = 100;
 int resultMenu[3];
 int resultMenuY[3] = {335, 400, 470};
 int resultSelectMenu = 0;
@@ -135,10 +142,11 @@ void Load(){
 	danceEvalScoreH[1] =  LoadGraph("Image/score_normal.png");
 	danceEvalScoreH[2] =  LoadGraph("Image/score_good.png");
 
-	CurSor[0] = LoadGraph("Image/c_left.png");
-	CurSor[1] = LoadGraph("Image/c_right.png");
-	CurSor[2] = LoadGraph("Image/c_down.png");
-	CurSor[3] = LoadGraph("Image/c_up.png");
+	CurSor[0] = 0;
+	CurSor[1] = LoadGraph("Image/c_up.png");
+	CurSor[2] = LoadGraph("Image/c_right.png");
+	CurSor[3] = LoadGraph("Image/c_down.png");
+	CurSor[4] = LoadGraph("Image/c_left.png");
 
 	stageBackH[0] = LoadGraph("Image/BackImage_Stage1.png");
 	stageBackH[1] = LoadGraph("Image/BackImage_Stage2.png");
@@ -168,10 +176,32 @@ void setDanceEval() {
 
 }
 
+void SetNotes(){
+	//ノーツ発生
+	for(int k=0; k <sizeof NotesPattern/sizeof(int) ;k++){
+		if(NotesPattern[k] != 0){
+				// ショットの位置を設定
+				NotesX[ k ] = MAX_DISPLAY_SIZE_X + k*(10*FPS)+NotesSizeX ;
+				NotesY[ k ] = 400 ;
+				// ノーツデータを使用中にセット
+				Notes[k] = NotesPattern[k];
+		}
+	}
+
+	g_judgenumber = 0;
+	for(int l = 0; l < sizeof(NotesPattern) /sizeof(int);l++){
+		if(NotesPattern[l] != 0){
+			JudgePattern[g_judgenumber] = NotesPattern[l];
+			g_judgenumber++;
+		}
+	}
+	g_judgenumber = 0;
+}
+
 void PlayIni(){
 	// プレイヤーの初期位置をセット
-	PlayerX = 100 ;
-	PlayerY = 75 ;
+	PlayerX = 200;
+	PlayerY = 75;
 
 	PlayerSizeX = 200;
 	PlayerSizeY = 250;
@@ -189,41 +219,11 @@ void PlayIni(){
 	GameCnt=0;
 
 	FpsDelayCnt=0;
-
+	SetNotes();//譜面セット
 	
 }
 
-void SetNotes(){
-	int n;
-	boolean FirstFlag = TRUE;
-	//ノーツ発生
-	for(int k=0;k<sizeof NotesPattern/sizeof(int);k++){
 
-		if(NotesPattern[k]==1){
-
-			// 使われていないノーツデータを探す
-			for( n = 0 ; n < MAX_NOTES ; n ++ ){
-				if( Notes[ n ] == 0 ) break ;
-			}
-			// もし使われていないノーツデータがあったらノーツを出す
-			if( n != MAX_NOTES ){
-				// ショットの位置を設定
-				NotesX[ n ] = MAX_DISPLAY_SIZE_X-60 + k*(10*FPS)+NotesSizeX ;
-				NotesY[ n ] = 400 ;
-
-				// ノーツデータを使用中にセット
-				Notes[ n ] = 1 ;
-
-				if(FirstFlag){
-					Hit[ n ] = 2;//判定ノーツ
-					FirstFlag = FALSE;
-				}else{
-					Hit[ n ] = 1;
-				}
-			}
-		}	
-	}
-}
 
 void Move(){
 	// ノーツの移動処理
@@ -236,7 +236,12 @@ void Move(){
 		NotesX[ j ] -= 10 ;
 
 		// 画面外に出ていたら無効にする
-		if( NotesX[ j ] < -50 ) Notes[ j ] = 0 ;
+		if( NotesX[ j ] < -50 ){
+			Notes[j] = 0;
+			NotesX[j] = 1000;
+			g_judgenumber++;
+			GameHp--;
+		}
 	}
 }
 
@@ -260,8 +265,8 @@ void Draw(){
 	// ノーツを描画する
 	for(int j = 0 ; j < MAX_NOTES ; j ++ ){
 		// ノーツデータが有効な時のみ描画
-		if( Notes[j] == 1 ) {
-			DrawGraph( NotesX[j] + FpsDelayCnt*10 , NotesY[j] , CurSor[j % 4] , TRUE);
+		if( Notes[j] != 0 ) {
+			DrawGraph( NotesX[j] + FpsDelayCnt*10 , NotesY[j] , CurSor[NotesPattern[j]] , TRUE);
 		
 			if((CheckHitKey(KEY_INPUT_SPACE) != 0) && ( PlayerX < NotesX[j] ) && ( PlayerX + PlayerSizeX > NotesX[j] )){
 
@@ -381,6 +386,14 @@ void StageSelectDraw() {
 	}
 }
 
+void CharacterMove(int ComandNumber,int ObjectNumber)
+{
+	GDrawFlag = ComandNumber;
+	Notes[ObjectNumber] = 0;
+	NotesX[ObjectNumber] = 1000;
+	g_judgenumber++;
+
+}
 
 void CharMove(){
 	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
@@ -392,14 +405,84 @@ void CharMove(){
 	} else if(cnt % 30 == 0) {
 		GDrawFlag = 1;
 	}
-	if ( Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2 ) { 
-		GDrawFlag=2;
-	}else if( Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4 ){
-		GDrawFlag=4;
-	}else if( Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3 ){
-		GDrawFlag=6;
-	}else if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 ){
-		GDrawFlag=8;
+	for(int j=0; j <sizeof NotesPattern/sizeof(int) ;j++){
+	switch(JudgePattern[g_judgenumber]){
+		case 0:
+
+			break;
+		case 1:
+			if ((Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2)&&NotesPattern[j] == 1)
+			{ 		
+				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+				{
+					CharacterMove(2,j);		
+					GameHp++;
+				}
+				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+				{
+					CharacterMove(3,j);		
+				}
+				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+				{
+					CharacterMove(10,j);
+					GameHp--;
+				}
+			}
+			break;
+		case 2:
+			if((Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4)&&NotesPattern[j] == 2){
+				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+				{
+					CharacterMove(4,j);		
+					GameHp++;
+					}
+					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+					{
+					CharacterMove(5,j);		
+					}
+					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+					{
+					CharacterMove(10,j);
+					GameHp--;
+					}			
+			}
+			break;
+		case 3:
+			if( (Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3) &&NotesPattern[j] == 3){
+				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+				{
+					CharacterMove(6,j);	
+					GameHp++;
+				}
+				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+				{
+					CharacterMove(7,j);		
+				}
+				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+				{
+					CharacterMove(10,j);
+					GameHp--;
+				}			
+			}
+			break;
+		case 4:
+			if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 && NotesPattern[j] == 4){
+				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+				{
+					CharacterMove(8,j);		
+					GameHp++;
+				}
+				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+				{
+					CharacterMove(9,j);		
+				}
+				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+				{
+					CharacterMove(10,j);
+					GameHp--;
+				}			
+			}
+			break;}
 	}
 
 	if (Pad & PAD_INPUT_L) {
