@@ -767,7 +767,7 @@ void StaffRollDraw() {
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine, int nCmdShow ){
 	DWORD tick;
 
-	ChangeWindowMode( TRUE ) ;//ウィンドウズモード
+	ChangeWindowMode( FALSE ) ;//ウィンドウズモード
 	SetGraphMode( MAX_DISPLAY_SIZE_X , MAX_DISPLAY_SIZE_Y , 16 ) ;//960*540
 	if( DxLib_Init() == -1 )	// ＤＸライブラリ初期化処理
 	{
