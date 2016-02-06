@@ -255,6 +255,7 @@ void setDanceEval() {
 	} else {
 		danceeVal = 0;
 	}
+	PlaySound(MHandle[7]);
 
 }
 
