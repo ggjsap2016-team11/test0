@@ -255,6 +255,7 @@ void setDanceEval() {
 	} else {
 		danceeVal = 0;
 	}
+	StopSoundMem(SHandle[selectMode]);
 	PlaySound(MHandle[7]);
 
 }
@@ -431,6 +432,7 @@ void MainGameInit() {
 	GameHp = 50;
 	danceeVal = 0;
 	danceScore = 0;
+	PlaySoundMem(SHandle[selectMode] , DX_PLAYTYPE_BACK);
 	Frame=3;//ÉQÅ[ÉÄâÊñ Ç…ëJà⁄                    
 }
 
@@ -683,15 +685,7 @@ void OpeningDraw() {
 }
 
 
-void Game(){
-	
-	static boolean Flag=true;
-
-	if(Flag){
-		PlaySoundMem( SHandle[selectMode] , DX_PLAYTYPE_BACK ) ;
-		Flag=FALSE;
-	}
-	
+void Game(){	
 	Move();
 	Draw();//ï`âÊ
 	CharMove();
@@ -758,6 +752,7 @@ void ResultUpdate() {
 				GameHp = 50;
 				danceeVal = 0;
 				danceScore = 0;
+				PlaySoundMem( SHandle[selectMode] , DX_PLAYTYPE_BACK);
 				Frame=3;//ÉQÅ[ÉÄâÊñ Ç…ëJà⁄                    
 				break;
 			case 1:
