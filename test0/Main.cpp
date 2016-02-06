@@ -29,7 +29,7 @@ float FpsDelayCnt;
 
 int cnt = 0;//起動時からのカウント
 
-int Frame=0;//画面遷移
+int Frame=2;//画面遷移
 
 
 int GHandle[11];
@@ -381,9 +381,9 @@ void TitleDraw() {
 
 void TitleUpdate() {
 
-	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
+	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1);
     if (TitleSelectCount <= 0 && TitleChangeFlg == 0 && (Pad & PAD_INPUT_4) ) {  
-		PlaySoundMem( MHandle[0] , DX_PLAYTYPE_BACK ) ;
+		PlaySoundMem( MHandle[0] , DX_PLAYTYPE_BACK);
 		TitleChangeFlg = 1;
 	}
 
@@ -409,6 +409,17 @@ void TitleUpdate() {
 	}
 
 }
+
+void MainGameInit() {
+	PlayIni();//初期化
+	SetNotes();//譜面セット
+	GameHp = 50;
+	danceeVal = 0;
+	danceScore = 0;
+	Frame=3;//ゲーム画面に遷移                    
+}
+
+
 
 void StageSelectKey() {
 	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
@@ -440,23 +451,20 @@ void StageSelectKey() {
 		selectChangeCount = 0;
 	}
 
-
 	if (selectChangeCount == 0 && Pad & PAD_INPUT_4) {
 		PlaySoundMem( MHandle[0] , DX_PLAYTYPE_BACK ) ;
 		switch(selectMode) {
 			case 0:
-				Frame = 2;
-				selectStageDif = 0;
+				MainGameInit();
 				break;
 			case 1:
 				selectStageDif = 1;
-				Frame =2;
+				MainGameInit();
 				break;
 			case 2:
 				Frame = 0;
 				break;
 		}
-
 	}
 
 
@@ -527,22 +535,22 @@ void CharMove(){
 					if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
 					{
 						CharacterMove(4,j);		
-						EffectFlag = 0;//
+						EffectFlag = 0;
 						GameHp++;
 						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK ) ;
-						}
-						else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
-						{
+					}
+					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+					{
 						CharacterMove(5,j);		
-						EffectFlag = 1;//
+						EffectFlag = 1;
 						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK ) ;
-						}
-						else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
-						{
+					}
+					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+					{
 						CharacterMove(10,j);
-						EffectFlag = 2;//
+						EffectFlag = 2;
 						GameHp--;
-						}			
+					}			
 				}
 				break;
 			case 3:
@@ -591,33 +599,22 @@ void CharMove(){
 					}			
 				}
 				break;
-				default:
-					Frame =5;
-					break;
-
+			default:
+				Frame =5;
+				break;
 
 		}
 	}
 
-	if (Pad & PAD_INPUT_L) {
-		GameHp--;
-	}
-
-	if (Pad & PAD_INPUT_R) {
-		danceScore++;
-		GameHp++;
-	}
 }
 
 void OpeningUpdate() {
     int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-    if(OpeiningCount >= 660 && Pad & PAD_INPUT_4 ){
-		PlayIni();//初期化
-		SetNotes();//譜面セット
-		GameHp = 50;
-		danceeVal = 0;
-		danceScore = 0;
-		Frame=3;//ゲーム画面に遷移                    
+    if(OpeiningCount >= 660 || Pad & PAD_INPUT_4 ){
+		Frame = 0;
+		TitleChangeCount = 0;
+		TitleChangeFlg = 0;
+		TitleSelectCount = 30;
     }
 }
 
@@ -764,20 +761,19 @@ void StaffRollDraw() {
 }
 
 
-
-
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine, int nCmdShow ){
 	DWORD tick;
 
-	ChangeWindowMode( TRUE ) ;//ウィンドウズモード
-	SetGraphMode( MAX_DISPLAY_SIZE_X , MAX_DISPLAY_SIZE_Y , 16 ) ;//960*540
-	if( DxLib_Init() == -1 )	// ＤＸライブラリ初期化処理
+	ChangeWindowMode(TRUE);
+	SetGraphMode(MAX_DISPLAY_SIZE_X, MAX_DISPLAY_SIZE_Y, 16);
+	if( DxLib_Init() == -1 )
 	{
-		 return -1;				// エラーが起きたら直ちに終了
+		 return -1;	
 	}
 
 	TitleChangeFlg = 0;
 	TitleChangeCount = 0;
+	TitleSelectCount = 30;
 
 	// 描画先画面を裏画面にセット
 	SetDrawScreen( DX_SCREEN_BACK ) ;
@@ -826,11 +822,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 		
 		}
 		
-		ScreenFlip() ;// 裏画面の内容を表画面に反映させる
+		ScreenFlip();
 
 	}
 
-	DxLib_End();				// ＤＸライブラリ使用の終了処理
-
-	return 0;					// ソフトの終了
+	DxLib_End();
+	return 0;
 }
