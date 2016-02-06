@@ -69,6 +69,8 @@ int CurSor[5];
 int selectStageNumber;
 int selectStageDif;
 int selectMode;
+int selectStageDifH[3];
+int selectStageDifunH[3];
 int selectModeY[3] = {145, 260, 365};
 int selectChangeCount = 0;
 int stageBackH[2];
@@ -80,10 +82,10 @@ const int Tama_w =40;
 const int BorderJust = 20;
 const int BorderNear = 50;
 const int BorderMiss = 100;
-int DecisionEffect[3];//
-int EffectFlag = 4;//
-int EffectSizeHalf = 75;//
-int EffectTimer =0;//
+int DecisionEffect[3];
+int EffectFlag = 4;
+int EffectSizeHalf = 75;
+int EffectTimer =0;
 int resultMenu[3];
 int resultMenuY[3] = {335, 400, 470};
 int resultSelectMenu = 0;
@@ -114,32 +116,32 @@ bool Update(){
 }
 
 void Wait(){
-	int tookTime = GetNowCount() - mStartTime;	//Ç©Ç©Ç¡ÇΩéûä‘
-	int waitTime = mCount*1000/FPS - tookTime;	//ë“Ç¬Ç◊Ç´éûä‘
+	int tookTime = GetNowCount() - mStartTime;
+	int waitTime = mCount*1000/FPS - tookTime;
 	if( waitTime > 0 ){
-		Sleep(waitTime);	//ë“ã@
+		Sleep(waitTime);
 	}
 }
 
 void Load(){
 
 
-	GHandle[0] = LoadGraph("Image/PlayerWait1.png");//ë“ã@1
-	GHandle[1] = LoadGraph("Image/PlayerWait2.png");//ë“ã@2
+	GHandle[0] = LoadGraph("Image/PlayerWait1.png");
+	GHandle[1] = LoadGraph("Image/PlayerWait2.png");
 
-	GHandle[2] = LoadGraph("Image/ActionUp_Just.png");//è„just
-	GHandle[3] = LoadGraph("Image/ActionUp_Near.png");//è„near
-	GHandle[4] = LoadGraph("Image/ActionRight_Just.png");//âEjust
-	GHandle[5] = LoadGraph("Image/ActionRight_Near.png");//âEnear
-	GHandle[6] = LoadGraph("Image/ActionDown_Just.png");//â∫just
-	GHandle[7] = LoadGraph("Image/ActionDown_Near.png");//â∫near
-	GHandle[8] = LoadGraph("Image/ActionLeft_Just.png");//ç∂just
-	GHandle[9] = LoadGraph("Image/ActionLeft_Near.png");//ç∂near
-	GHandle[10] = LoadGraph("Image/miss.png");//miss
+	GHandle[2] = LoadGraph("Image/ActionUp_Just.png");
+	GHandle[3] = LoadGraph("Image/ActionUp_Near.png");
+	GHandle[4] = LoadGraph("Image/ActionRight_Just.png");
+	GHandle[5] = LoadGraph("Image/ActionRight_Near.png");
+	GHandle[6] = LoadGraph("Image/ActionDown_Just.png");
+	GHandle[7] = LoadGraph("Image/ActionDown_Near.png");
+	GHandle[8] = LoadGraph("Image/ActionLeft_Just.png");
+	GHandle[9] = LoadGraph("Image/ActionLeft_Near.png");
+	GHandle[10] = LoadGraph("Image/miss.png");
 
-	DecisionEffect[0]= LoadGraph("Image/Effect_Just.png");//
-	DecisionEffect[1]= LoadGraph("Image/Effect_Near.png");//
-	DecisionEffect[2]= LoadGraph("Image/Effect_Miss.png");//
+	DecisionEffect[0]= LoadGraph("Image/Effect_Just.png");
+	DecisionEffect[1]= LoadGraph("Image/Effect_Near.png");
+	DecisionEffect[2]= LoadGraph("Image/Effect_Miss.png");
 
 	BackHandle = LoadGraph("Image/BackImage_Stage1.png");
 	StageBottom = LoadGraph("Image/stage_bottom.png");
@@ -196,7 +198,16 @@ void Load(){
 	LevelHandle[3] = LoadGraph("Image/result_title.png");
 	LevelHandle[4] = LoadGraph("Image/result_title.png");
 	LevelHandle[5] = LoadGraph("Image/result_title.png");
-	
+
+	selectStageDifH[0] = LoadGraph("Image/level_01.png");
+	selectStageDifH[1] = LoadGraph("Image/level_02.png");
+	selectStageDifH[2] = LoadGraph("Image/level_03.png");
+
+
+	selectStageDifunH[0] = LoadGraph("Image/level_01x.png");
+	selectStageDifunH[1] = LoadGraph("Image/level_02x.png");
+	selectStageDifunH[2] = LoadGraph("Image/level_03x.png");
+
 	RBaseHandle = LoadGraph("Image/result_title.png");
 
 	//ã»	
@@ -233,7 +244,7 @@ void Load(){
 
 //å¯â âπÇçƒê∂
 void PlaySound(int Handle){
-	PlaySoundMem( Handle , DX_PLAYTYPE_BACK ) ;
+	PlaySoundMem( Handle , DX_PLAYTYPE_BACK);
 }
 
 void setDanceEval() {
@@ -312,13 +323,14 @@ void Move(){
 			NotesX[j] = 1000;
 			g_judgenumber++;
 			GameHp--;
+			PlaySound(MHandle[8]);
 		}
 	}
 }
 
 void Draw(){
 	// îwåiîwåi
-	DrawGraph(0, 0, stageBackH[selectStageDif], TRUE);
+	DrawGraph(0, 0, stageBackH[selectStageNumber], TRUE);
 	DrawGraph(0, 0, StageBottom, TRUE);
 	//ÉvÉåÉCÉÑÅ[ï`âÊ
 	
@@ -425,6 +437,7 @@ void StageSelectKey() {
 	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //ì¸óÕèÛë‘ÇPadÇ…äiî[
 
 	if (selectChangeCount == 0 && Pad & PAD_INPUT_UP) { 
+		PlaySound(MHandle[10]);
 		selectMode--;
 		if (selectMode < 0) {
 			selectMode = 0;
@@ -432,9 +445,17 @@ void StageSelectKey() {
 
 		selectChangeCount = 30;
 	}
-	if( Pad & PAD_INPUT_RIGHT){
+	if(selectChangeCount == 0 && Pad & PAD_INPUT_RIGHT) {
+		PlaySound(MHandle[10]);
+		selectStageDif++;
+		if (selectStageDif > 2) {
+			selectStageDif = 2;
+		}
+
+		selectChangeCount = 30;
 	}
 	if(selectChangeCount == 0 && Pad & PAD_INPUT_DOWN){
+		PlaySound(MHandle[10]);
 		selectMode++;
 		if (selectMode > 2) {
 			selectMode = 2;
@@ -443,7 +464,14 @@ void StageSelectKey() {
 
 	}
 	
-	if( Pad & PAD_INPUT_LEFT){
+	if(selectChangeCount == 0 && Pad & PAD_INPUT_LEFT){
+		PlaySound(MHandle[10]);
+		selectStageDif--;
+		if (selectStageDif < 0) {
+			selectStageDif = 0;
+		}
+		selectChangeCount = 30;
+
 	}
 
 	selectChangeCount--;
@@ -458,6 +486,7 @@ void StageSelectKey() {
 				MainGameInit();
 				break;
 			case 1:
+				selectStageNumber = 1;
 				selectStageDif = 1;
 				MainGameInit();
 				break;
@@ -480,6 +509,20 @@ void StageSelectDraw() {
 	for (int i = 0; i < 3; i++) {
 		DrawGraph(225, selectModeY[i], selectModeH[i], TRUE);
 	}
+
+	for (int i = 0; i < 3; i++) {
+		if (selectMode == 0 && i == selectStageDif) {
+			DrawGraph(675+(i*45), 145, selectStageDifH[i], TRUE);
+		} else {
+			DrawGraph(675+(i*45), 155, selectStageDifunH[i], TRUE);
+		}
+		if (selectMode == 1 && i == selectStageDif) {
+			DrawGraph(675+(i*45), 255, selectStageDifH[i], TRUE);
+		} else {
+			DrawGraph(675+(i*45), 265, selectStageDifunH[i], TRUE);
+		}
+	}
+
 }
 
 void CharacterMove(int ComandNumber,int ObjectNumber)
@@ -519,14 +562,15 @@ void CharMove(){
 					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
 					{
 						CharacterMove(3,j);		
-						EffectFlag = 1;//
+						EffectFlag = 1;
 						PlaySound(MHandle[6]);
 					}
 					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
 					{
 						CharacterMove(10,j);
-						EffectFlag = 2;//
+						EffectFlag = 2;
 						GameHp--;
+						PlaySound(MHandle[8]);
 					}
 				}
 				break;
@@ -537,19 +581,20 @@ void CharMove(){
 						CharacterMove(4,j);		
 						EffectFlag = 0;
 						GameHp++;
-						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK ) ;
+						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK);
 					}
 					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
 					{
 						CharacterMove(5,j);		
 						EffectFlag = 1;
-						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK ) ;
+						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK);
 					}
 					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
 					{
 						CharacterMove(10,j);
 						EffectFlag = 2;
 						GameHp--;
+						PlaySound(MHandle[8]);
 					}			
 				}
 				break;
@@ -573,6 +618,7 @@ void CharMove(){
 						CharacterMove(10,j);
 						EffectFlag = 2;//
 						GameHp--;
+						PlaySound(MHandle[8]);
 					}			
 				}
 				break;
@@ -588,14 +634,15 @@ void CharMove(){
 					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
 					{
 						CharacterMove(9,j);	
-						EffectFlag = 1;//
+						EffectFlag = 1;
 						PlaySoundMem( MHandle[4] , DX_PLAYTYPE_BACK ) ;
 					}
 					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
 					{
 						CharacterMove(10,j);
-						EffectFlag = 2;//
+						EffectFlag = 2;
 						GameHp--;
+						PlaySound(MHandle[8]);
 					}			
 				}
 				break;
@@ -674,6 +721,7 @@ void ResultUpdate() {
 	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //ì¸óÕèÛë‘ÇPadÇ…äiî[
 
 	if (selectResultCount == 0 && Pad & PAD_INPUT_UP) { 
+		PlaySound(MHandle[10]);
 		resultSelectMenu--;
 		if (resultSelectMenu < 0) {
 			resultSelectMenu = 0;
@@ -682,6 +730,7 @@ void ResultUpdate() {
 		selectResultCount = 30;
 	}
 	if(selectResultCount == 0 && Pad & PAD_INPUT_DOWN){
+		PlaySound(MHandle[10]);
 		resultSelectMenu++;
 		if (resultSelectMenu > 2) {
 			resultSelectMenu = 2;
@@ -765,6 +814,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 	DWORD tick;
 
 	ChangeWindowMode(TRUE);
+	SetMainWindowText("Ç∆Ç‘Ç®ÇÍ");
 	SetGraphMode(MAX_DISPLAY_SIZE_X, MAX_DISPLAY_SIZE_Y, 16);
 	if( DxLib_Init() == -1 )
 	{
