@@ -44,6 +44,7 @@ int GTitleStartPushHandle;
 int StageSelectHanele;
 int TitleChangeFlg;
 int TitleChangeCount;
+int TitleSelectCount;
 int PrevScene;
 int WaitTime;
 
@@ -385,23 +386,30 @@ void TitleDraw() {
 void TitleUpdate() {
 
 	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //“ü—Íó‘Ô‚ğPad‚ÉŠi”[
-    if (TitleChangeFlg == 0 && (Pad & PAD_INPUT_4) ) {  
+    if (TitleSelectCount <= 0 && TitleChangeFlg == 0 && (Pad & PAD_INPUT_4) ) {  
 		PlaySoundMem( MHandle[0] , DX_PLAYTYPE_BACK ) ;
 		TitleChangeFlg = 1;
 	}
 
-	if (Pad & PAD_INPUT_L) {
+	if (TitleSelectCount <= 0 && (Pad & PAD_INPUT_L)) {
 		StaffRollCount = 0;
 		Frame = 6;
+		TitleSelectCount = 30;
 	}
 
 	if (TitleChangeFlg == 1) {
 		if (TitleChangeCount >= 120) {
 			Frame = 1;
 			TitleChangeCount = 0;
+			TitleChangeFlg = 0;
+			TitleSelectCount = 30;
 		} else {
 			TitleChangeCount++;
 		}
+	}
+
+	if (Frame == 0 && TitleSelectCount > 0) {
+		TitleSelectCount--;
 	}
 
 }
