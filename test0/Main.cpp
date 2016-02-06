@@ -229,8 +229,6 @@ void Load(){
 	staffRollH[7] = LoadGraph("Image/staffroll_8.png");
 
 
-
-
 }
 
 //効果音を再生
@@ -253,11 +251,11 @@ void SetNotes(){
 	//ノーツ発生
 	for(int k=0; k <sizeof NotesPattern/sizeof(int) ;k++){
 		if(NotesPattern[k] != 0){
-				// ショットの位置を設定
-				NotesX[ k ] = MAX_DISPLAY_SIZE_X -60+ k*(5*FPS) ;
-				NotesY[ k ] = 400 ;
-				// ノーツデータを使用中にセット
-				Notes[k] = NotesPattern[k];
+			// ショットの位置を設定
+			NotesX[ k ] = MAX_DISPLAY_SIZE_X -60+ k*(5*FPS) ;
+			NotesY[ k ] = 400 ;
+			// ノーツデータを使用中にセット
+			Notes[k] = NotesPattern[k];
 		}
 	}
 
@@ -327,22 +325,20 @@ void Draw(){
 	DrawGraph(PlayerX, PlayerY, GHandle[GDrawFlag], TRUE);
 
 	//fpsを表示
-	//DrawFormatString(MAX_DISPLAY_SIZE_X-80,MAX_DISPLAY_SIZE_Y-20,GetColor( 255 , 255 , 255 ),"FPS %.1f",mFps); 
 	if(mFps<60 ){
 		FpsDelayCnt-=(60.0f-mFps) / 60.0f;
 	}else if(mFps>60){
 		FpsDelayCnt-=(60.0f-mFps) / 60.0f;
 	}
-	//DrawFormatString(MAX_DISPLAY_SIZE_X-180,MAX_DISPLAY_SIZE_Y-60,GetColor( 255 , 255 , 255 ),"FPSD %f",FpsDelayCnt); 
 
 	if(EffectFlag != 4 && EffectTimer <=10){//
 		DrawGraph((PlayerX+PlayerSizeX/2) - EffectSizeHalf,365,DecisionEffect[EffectFlag],TRUE);//
-		EffectTimer++;//
-		if(EffectTimer > 10){//
-			EffectTimer = 0;//
-			EffectFlag = 4;//
-		}//
-	}//
+		EffectTimer++;
+		if(EffectTimer > 10){
+			EffectTimer = 0;
+			EffectFlag = 4;
+		}
+	}
 
 	// ノーツを描画する
 	for(int j = 0 ; j < MAX_NOTES ; j ++ ){
@@ -490,8 +486,6 @@ void CharacterMove(int ComandNumber,int ObjectNumber)
 
 void CharMove(){
 	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
-	int num;
-
 	
 	if (cnt % 60 ==0) {
 		GDrawFlag = 0;
@@ -500,109 +494,109 @@ void CharMove(){
 		GDrawFlag = 1;
 	}
 	for(int j=0; j <sizeof NotesPattern/sizeof(int) ;j++){
-	switch(JudgePattern[g_judgenumber]){
-		case 0:
+		switch(JudgePattern[g_judgenumber]){
+			case 0:
 
-			break;
-		case 1:
-			if ((Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2)&&NotesPattern[j] == 1)
-			{ 		
-				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
-				{
-					CharacterMove(2,j);		
-					EffectFlag = 0;//
-					GameHp++;
-					PlaySound(MHandle[6]);
-				}
-				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
-				{
-					CharacterMove(3,j);		
-					EffectFlag = 1;//
-					PlaySound(MHandle[6]);
-				}
-				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
-				{
-					CharacterMove(10,j);
-					EffectFlag = 2;//
-					GameHp--;
-				}
-			}
-			break;
-		case 2:
-			if((Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4)&&NotesPattern[j] == 2){
-				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
-				{
-					CharacterMove(4,j);		
-					EffectFlag = 0;//
-					GameHp++;
-					PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK ) ;
+				break;
+			case 1:
+				if ((Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2)&&NotesPattern[j] == 1)
+				{ 		
+					if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+					{
+						CharacterMove(2,j);		
+						EffectFlag = 0;//
+						GameHp++;
+						PlaySound(MHandle[6]);
 					}
 					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
 					{
-					CharacterMove(5,j);		
-					EffectFlag = 1;//
-					PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK ) ;
+						CharacterMove(3,j);		
+						EffectFlag = 1;//
+						PlaySound(MHandle[6]);
 					}
 					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
 					{
-					CharacterMove(10,j);
-					EffectFlag = 2;//
-					GameHp--;
-					}			
-			}
-			break;
-		case 3:
-			if( (Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3) &&NotesPattern[j] == 3){
-				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
-				{
-					CharacterMove(6,j);	
-					EffectFlag = 0;//
-					GameHp++;
-					PlaySoundMem( MHandle[3] , DX_PLAYTYPE_BACK ) ;
+						CharacterMove(10,j);
+						EffectFlag = 2;//
+						GameHp--;
+					}
 				}
-				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
-				{
-					CharacterMove(7,j);		
-					EffectFlag = 1;//
-					PlaySoundMem( MHandle[3] , DX_PLAYTYPE_BACK ) ;
-				}
-				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
-				{
-					CharacterMove(10,j);
-					EffectFlag = 2;//
-					GameHp--;
-				}			
-			}
-			break;
-		case 4:
-			if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 && NotesPattern[j] == 4){
-				if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
-				{
-					CharacterMove(8,j);	
-					EffectFlag = 0;//
-					GameHp++;
-					PlaySoundMem( MHandle[4] , DX_PLAYTYPE_BACK ) ;
-				}
-				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
-				{
-					CharacterMove(9,j);	
-					EffectFlag = 1;//
-					PlaySoundMem( MHandle[4] , DX_PLAYTYPE_BACK ) ;
-				}
-				else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
-				{
-					CharacterMove(10,j);
-					EffectFlag = 2;//
-					GameHp--;
-				}			
-			}
-			break;
-			default:
-				Frame =5;
 				break;
+			case 2:
+				if((Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4)&&NotesPattern[j] == 2){
+					if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+					{
+						CharacterMove(4,j);		
+						EffectFlag = 0;//
+						GameHp++;
+						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK ) ;
+						}
+						else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+						{
+						CharacterMove(5,j);		
+						EffectFlag = 1;//
+						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK ) ;
+						}
+						else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+						{
+						CharacterMove(10,j);
+						EffectFlag = 2;//
+						GameHp--;
+						}			
+				}
+				break;
+			case 3:
+				if( (Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3) &&NotesPattern[j] == 3){
+					if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+					{
+						CharacterMove(6,j);	
+						EffectFlag = 0;//
+						GameHp++;
+						PlaySoundMem( MHandle[3] , DX_PLAYTYPE_BACK ) ;
+					}
+					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+					{
+						CharacterMove(7,j);		
+						EffectFlag = 1;//
+						PlaySoundMem( MHandle[3] , DX_PLAYTYPE_BACK ) ;
+					}
+					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+					{
+						CharacterMove(10,j);
+						EffectFlag = 2;//
+						GameHp--;
+					}			
+				}
+				break;
+			case 4:
+				if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 && NotesPattern[j] == 4){
+					if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+					{
+						CharacterMove(8,j);	
+						EffectFlag = 0;//
+						GameHp++;
+						PlaySoundMem( MHandle[4] , DX_PLAYTYPE_BACK ) ;
+					}
+					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+					{
+						CharacterMove(9,j);	
+						EffectFlag = 1;//
+						PlaySoundMem( MHandle[4] , DX_PLAYTYPE_BACK ) ;
+					}
+					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+					{
+						CharacterMove(10,j);
+						EffectFlag = 2;//
+						GameHp--;
+					}			
+				}
+				break;
+				default:
+					Frame =5;
+					break;
 
 
-	}
+		}
 	}
 
 	if (Pad & PAD_INPUT_L) {
@@ -800,7 +794,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 
 		// 画面を初期化する
 		ClearDrawScreen() ;
-		int Pad;
 		switch(Frame){
 			case 0:
 				TitleDraw();
@@ -835,11 +828,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 		
 		ScreenFlip() ;// 裏画面の内容を表画面に反映させる
 
-		////BGMとの同期
-		//WaitTime = tick + (1000.0f/FPS*cnt) - GetTickCount();
-		//if(WaitTime > 0){
-		//	Sleep(WaitTime);
-		//}
 	}
 
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
