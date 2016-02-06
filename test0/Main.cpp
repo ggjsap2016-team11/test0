@@ -199,8 +199,8 @@ void Load(){
 	RBaseHandle = LoadGraph("Image/result_title.png");
 
 	//曲	
-	SHandle[0] = LoadSoundMem("Sound/GGJ_music1　BPM120.wav");
-	SHandle[1] = LoadSoundMem("Sound/GGJ_music2 completed BPM135.wav");
+	SHandle[0] = LoadSoundMem("Sound/GGJ_music1BPM120.wav");
+	SHandle[1] = LoadSoundMem("Sound/GGJ_music2completedBPM135.wav");
 
 	MusicTime[0] = 77;
 	MusicTime[1] = 62;
@@ -767,7 +767,7 @@ void StaffRollDraw() {
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine, int nCmdShow ){
 	DWORD tick;
 
-	ChangeWindowMode( FALSE ) ;//ウィンドウズモード
+	ChangeWindowMode( TRUE ) ;//ウィンドウズモード
 	SetGraphMode( MAX_DISPLAY_SIZE_X , MAX_DISPLAY_SIZE_Y , 16 ) ;//960*540
 	if( DxLib_Init() == -1 )	// ＤＸライブラリ初期化処理
 	{
