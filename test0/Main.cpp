@@ -376,6 +376,8 @@ void Draw(){
 	}else if((float)(GameCnt/60)/MusicTime[selectMode] >= 1){
 		DrawBox( 50 , 0 , MAX_DISPLAY_SIZE_X - 50 ,20  , GetColor( 0 , 150 , 0 ) , TRUE) ;
 	}
+    DrawRotaGraph3( 50, 500, 0, 0, ((float)GameHp / 100), 1.0f, 0, PowerBarHandle, TRUE);
+
 }
 
 void TitleDraw() {
@@ -647,6 +649,7 @@ void CharMove(){
 				}
 				break;
 			default:
+				setDanceEval();
 				Frame =5;
 				break;
 
@@ -706,6 +709,7 @@ void GameOverUpdate() {
 	if (GameOverCount > 300) {
 		resultSelectMenu = 0;
 		selectResultCount = 0;
+		setDanceEval();
 		Frame=5;
 	}
 }
