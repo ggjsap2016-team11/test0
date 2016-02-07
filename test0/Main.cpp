@@ -476,6 +476,13 @@ void CharacterMove(int ComandNumber,int ObjectNumber)
 
 }
 
+void CharacterMiss(int ObjectNumber) {
+	CharacterMove(10, ObjectNumber);
+	EffectFlag = 2;
+	GameHp--;
+	PlaySound(MHandle[8]);
+}
+
 void CharMove(){
 	int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 	
@@ -506,10 +513,7 @@ void CharMove(){
 					}
 					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
 					{
-						CharacterMove(10,j);
-						EffectFlag = 2;
-						GameHp--;
-						PlaySound(MHandle[8]);
+						CharacterMiss(j);
 					}
 				}
 				break;
@@ -530,10 +534,7 @@ void CharMove(){
 					}
 					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
 					{
-						CharacterMove(10,j);
-						EffectFlag = 2;
-						GameHp--;
-						PlaySound(MHandle[8]);
+						CharacterMiss(j);
 					}			
 				}
 				break;
@@ -554,10 +555,7 @@ void CharMove(){
 					}
 					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
 					{
-						CharacterMove(10, j);
-						EffectFlag = 2;
-						GameHp--;
-						PlaySound(MHandle[8]);
+						CharacterMiss(j);
 					}			
 				}
 				break;
@@ -578,10 +576,7 @@ void CharMove(){
 					}
 					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
 					{
-						CharacterMove(10,j);
-						EffectFlag = 2;
-						GameHp--;
-						PlaySound(MHandle[8]);
+						CharacterMiss(j);
 					}			
 				}
 				break;
