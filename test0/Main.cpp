@@ -88,6 +88,10 @@ int RBaseHandle;
 int SHandle[2];
 int staffRollH[8];
 int MHandle[12];
+int GameOverStart=0;
+int GameOverAnim=0;
+int GameClearStart=0;
+int GameClearAnim=0;
 
 bool Update(){
 	if( mCount == 0 ){ //1ƒtƒŒ[ƒ€–Ú‚È‚çŽž‚ð‹L‰¯
@@ -316,6 +320,26 @@ void Move(){
 			PlaySound(MHandle[8]);
 		}
 	}
+
+	if (GameOverStart == 1) {
+		GameOverAnim++;
+	}
+
+	if (GameClearStart == 1) {
+		GameClearAnim++;
+	}
+
+	if (GameOverStart == 1 && GameOverAnim >= 180) {
+		GameOverCount = 0;
+		setDanceEval();
+		Frame=4;
+	}
+
+	if (GameClearStart == 1 && GameClearAnim >= 180) {
+		setDanceEval();
+		Frame =5;
+	}
+
 }
 
 void Draw(){
@@ -358,7 +382,17 @@ void Draw(){
 	}else if(drawBoxCheckValue >= 1){
 		DrawBox( 50 , 0 , MAX_DISPLAY_SIZE_X - 50, 20 , GameLineColor , TRUE);
 	}
-    DrawRotaGraph3( 50, 500, 0, 0, ((float)GameHp / 100), 1.0f, 0, PowerBarHandle, TRUE);
+	if (GameHp > 0) {
+		DrawRotaGraph3( 50, 500, 0, 0, ((float)GameHp / 100), 1.0f, 0, PowerBarHandle, TRUE);
+	}
+	if (GameOverStart == 1 && GameOverAnim % 5 < 4) {
+		DrawGraph(310, 120, GameHandle[1], TRUE);
+	}
+	if (GameClearStart == 1 && GameClearAnim % 5 < 4) {
+		DrawGraph(310, 120, GameHandle[0], TRUE);
+	}
+
+
 
 }
 
@@ -368,6 +402,10 @@ void MainGameInit() {
 	GameHp = 50;
 	danceeVal = 0;
 	danceScore = 0;
+	GameOverStart = 0;
+	GameOverAnim = 0;
+	GameClearStart = 0;
+	GameClearAnim = 0;
 	PlaySoundMem(SHandle[selectMode] , DX_PLAYTYPE_BACK);
 	Frame=3;//ƒQ[ƒ€‰æ–Ê‚É‘JˆÚ                    
 }
@@ -581,8 +619,10 @@ void CharMove(){
 				}
 				break;
 			default:
-				setDanceEval();
-				Frame =5;
+				if (GameClearStart == 0) {
+					GameClearStart = 1;
+					PlaySound(MHandle[1]);
+				}
 				break;
 
 		}
@@ -595,10 +635,9 @@ void Game(){
 	Draw();
 	CharMove();
 
-	if (GameHp <= 0) {
-		GameOverCount = 0;
-		setDanceEval();
-		Frame=4;
+	if (GameHp <= 0 && GameOverStart == 0) {
+		PlaySound(MHandle[9]);
+		GameOverStart = 1;
 	}
 
 }
@@ -652,13 +691,7 @@ void ResultUpdate() {
 	if ( Pad & PAD_INPUT_4) {
 		switch(resultSelectMenu) {
 			case 0:
-				PlayIni();//‰Šú‰»
-				SetNotes();//•ˆ–ÊƒZƒbƒg
-				GameHp = 50;
-				danceeVal = 0;
-				danceScore = 0;
-				PlaySoundMem( SHandle[selectMode] , DX_PLAYTYPE_BACK);
-				Frame=3;//ƒQ[ƒ€‰æ–Ê‚É‘JˆÚ                    
+				MainGameInit();				
 				break;
 			case 1:
 				Frame =1;
