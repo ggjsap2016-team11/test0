@@ -35,7 +35,7 @@ int TitleUpdate(int startPushHandle, int sceneFrame) {
 	if (TitleSelectCount <= 0 && (Pad & PAD_INPUT_L)) {
 		StaffRollCount = 0;
 		sceneFrame = 6;
-		TitleSelectCount = 30;
+		TitleSelectCount = 20;
 	}
 
 	if (TitleChangeFlg == 1) {
@@ -43,7 +43,7 @@ int TitleUpdate(int startPushHandle, int sceneFrame) {
 			sceneFrame = 1;
 			TitleChangeCount = 0;
 			TitleChangeFlg = 0;
-			TitleSelectCount = 30;
+			TitleSelectCount = 20;
 		} else {
 			TitleChangeCount++;
 		}
@@ -63,7 +63,7 @@ int OpeningUpdate(int sceneFrame) {
 		sceneFrame = 0;
 		TitleChangeCount = 0;
 		TitleChangeFlg = 0;
-		TitleSelectCount = 30;
+		TitleSelectCount = 20;
     }
 	return sceneFrame;
 }

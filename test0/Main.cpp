@@ -27,7 +27,7 @@ static const int N = 60;	//平均を取るサンプル数
 static const int FPS = 60;	//設定したFPS
 static int GameHp = 50;
 float FpsDelayCnt;
-
+const int GameLineColor = GetColor(0 ,150 ,0 ); 
 int cnt = 0;//起動時からのカウント
 
 int Frame=2;//画面遷移
@@ -45,7 +45,7 @@ int GameCnt;//ゲームカウント
 int MusicTime[2];
 
 int NotesPattern[] = {1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0,1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0
-,1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0,-1};//テスト用
+,1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0,-1};
 int JudgePattern[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int StageBottom;
@@ -233,7 +233,7 @@ void Load(){
 
 //効果音を再生
 void PlaySound(int Handle){
-	PlaySoundMem( Handle , DX_PLAYTYPE_BACK);
+	PlaySoundMem(Handle ,DX_PLAYTYPE_BACK);
 }
 
 void setDanceEval() {
@@ -300,8 +300,7 @@ void PlayIni(){
 
 void Move(){
 	// ノーツの移動処理
-	int j;
-	for( j = 0 ; j < MAX_NOTES ; j ++ ){
+	for (int j = 0 ; j < MAX_NOTES ; j ++ ){
 		// ノーツデータが無効だったらスキップ
 		if( Notes[ j ] == 0 ) continue ;
 
@@ -328,14 +327,12 @@ void Draw(){
 	DrawGraph(PlayerX, PlayerY, GHandle[GDrawFlag], TRUE);
 
 	//fpsを表示
-	if(mFps<60 ){
-		FpsDelayCnt-=(60.0f-mFps) / 60.0f;
-	}else if(mFps>60){
+	if(mFps != 60 ){
 		FpsDelayCnt-=(60.0f-mFps) / 60.0f;
 	}
 
-	if(EffectFlag != 4 && EffectTimer <=10){//
-		DrawGraph((PlayerX+PlayerSizeX/2) - EffectSizeHalf,365,DecisionEffect[EffectFlag],TRUE);//
+	if(EffectFlag != 4 && EffectTimer <=10){
+		DrawGraph((PlayerX+PlayerSizeX/2) - EffectSizeHalf,365,DecisionEffect[EffectFlag],TRUE);
 		EffectTimer++;
 		if(EffectTimer > 10){
 			EffectTimer = 0;
@@ -347,25 +344,19 @@ void Draw(){
 	for(int j = 0 ; j < MAX_NOTES ; j ++ ){
 		// ノーツデータが有効な時のみ描画
 		if( Notes[j] != 0 ) {
-			DrawGraph( NotesX[j] + FpsDelayCnt*10 , NotesY[j] , CurSor[NotesPattern[j]] , TRUE);
-		
-			if((CheckHitKey(KEY_INPUT_SPACE) != 0) && ( PlayerX < NotesX[j] ) && ( PlayerX + PlayerSizeX > NotesX[j] )){
-
-
-			}else if(CheckHitKey(KEY_INPUT_SPACE) != 0 && ( PlayerX > NotesX[j]+NotesSizeX+50 ) && ( PlayerX + PlayerSizeX < NotesX[j] +50)){
-			}
-		}else{
+			DrawGraph( NotesX[j] + FpsDelayCnt*10 , NotesY[j] , CurSor[NotesPattern[j]] , TRUE);		
 		}
 	}
 
 	
-
 	//曲の現在位置
-	DrawBox( 50 , 0 , MAX_DISPLAY_SIZE_X - 50 , 20  , GetColor( 0 , 150 , 0 ) , FALSE) ;
-	if((float)(GameCnt/60)/MusicTime[selectMode] < 1){
-		DrawBox( 50 , 0 , 50 + ( MAX_DISPLAY_SIZE_X - 100 )*( (float)(GameCnt)/(MusicTime[selectMode]*60) ) , 20 , GetColor( 0 , 150 , 0 ) , TRUE) ;
-	}else if((float)(GameCnt/60)/MusicTime[selectMode] >= 1){
-		DrawBox( 50 , 0 , MAX_DISPLAY_SIZE_X - 50 ,20  , GetColor( 0 , 150 , 0 ) , TRUE) ;
+
+	DrawBox(50 ,0 ,MAX_DISPLAY_SIZE_X - 50 ,20 , GameLineColor, FALSE) ;
+	float drawBoxCheckValue = (float)(GameCnt/60)/MusicTime[selectMode];
+	if(drawBoxCheckValue < 1){
+		DrawBox( 50 , 0 , 50 + ( MAX_DISPLAY_SIZE_X - 100 )*( (float)(GameCnt)/(MusicTime[selectMode]*60) ), 20 , GameLineColor, TRUE);
+	}else if(drawBoxCheckValue >= 1){
+		DrawBox( 50 , 0 , MAX_DISPLAY_SIZE_X - 50, 20 , GameLineColor , TRUE);
 	}
     DrawRotaGraph3( 50, 500, 0, 0, ((float)GameHp / 100), 1.0f, 0, PowerBarHandle, TRUE);
 
@@ -384,7 +375,7 @@ void MainGameInit() {
 
 
 void StageSelectKey() {
-	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
+	int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
 	if (selectChangeCount == 0 && Pad & PAD_INPUT_UP) { 
 		PlaySound(MHandle[10]);
@@ -393,7 +384,7 @@ void StageSelectKey() {
 			selectMode = 0;
 		}
 
-		selectChangeCount = 30;
+		selectChangeCount = 20;
 	}
 	if(selectChangeCount == 0 && Pad & PAD_INPUT_RIGHT) {
 		PlaySound(MHandle[10]);
@@ -402,7 +393,7 @@ void StageSelectKey() {
 			selectStageDif = 2;
 		}
 
-		selectChangeCount = 30;
+		selectChangeCount = 20;
 	}
 	if(selectChangeCount == 0 && Pad & PAD_INPUT_DOWN){
 		PlaySound(MHandle[10]);
@@ -410,7 +401,7 @@ void StageSelectKey() {
 		if (selectMode > 2) {
 			selectMode = 2;
 		}
-		selectChangeCount = 30;
+		selectChangeCount = 20;
 
 	}
 	
@@ -420,7 +411,7 @@ void StageSelectKey() {
 		if (selectStageDif < 0) {
 			selectStageDif = 0;
 		}
-		selectChangeCount = 30;
+		selectChangeCount = 20;
 
 	}
 
@@ -486,7 +477,7 @@ void CharacterMove(int ComandNumber,int ObjectNumber)
 }
 
 void CharMove(){
-	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
+	int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 	
 	if (cnt % 60 ==0) {
 		GDrawFlag = 0;
@@ -495,27 +486,25 @@ void CharMove(){
 		GDrawFlag = 1;
 	}
 	for(int j=0; j <sizeof NotesPattern/sizeof(int) ;j++){
+		float borderGameClick = PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w);
 		switch(JudgePattern[g_judgenumber]){
-			case 0:
-
-				break;
 			case 1:
-				if ((Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2)&&NotesPattern[j] == 1)
-				{ 		
-					if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+				if ((Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2) && NotesPattern[j] == 1)
+				{ 	
+					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
 					{
 						CharacterMove(2,j);		
-						EffectFlag = 0;//
+						EffectFlag = 0;
 						GameHp++;
 						PlaySound(MHandle[6]);
 					}
-					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+					else if(borderGameClick < BorderNear && borderGameClick > -BorderNear)
 					{
 						CharacterMove(3,j);		
 						EffectFlag = 1;
 						PlaySound(MHandle[6]);
 					}
-					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
 					{
 						CharacterMove(10,j);
 						EffectFlag = 2;
@@ -526,20 +515,20 @@ void CharMove(){
 				break;
 			case 2:
 				if((Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4)&&NotesPattern[j] == 2){
-					if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
 					{
-						CharacterMove(4,j);		
+						CharacterMove(4, j);		
 						EffectFlag = 0;
 						GameHp++;
 						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK);
 					}
-					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+					else if(borderGameClick < BorderNear && borderGameClick > -BorderNear)
 					{
-						CharacterMove(5,j);		
+						CharacterMove(5, j);		
 						EffectFlag = 1;
 						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK);
 					}
-					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
 					{
 						CharacterMove(10,j);
 						EffectFlag = 2;
@@ -550,23 +539,23 @@ void CharMove(){
 				break;
 			case 3:
 				if( (Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3) &&NotesPattern[j] == 3){
-					if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
 					{
-						CharacterMove(6,j);	
-						EffectFlag = 0;//
+						CharacterMove(6, j);
+						EffectFlag = 0;
 						GameHp++;
-						PlaySoundMem( MHandle[3] , DX_PLAYTYPE_BACK ) ;
+						PlaySoundMem( MHandle[3] , DX_PLAYTYPE_BACK);
 					}
-					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+					else if(borderGameClick < BorderNear && borderGameClick > -BorderNear)
 					{
 						CharacterMove(7,j);		
-						EffectFlag = 1;//
-						PlaySoundMem( MHandle[3] , DX_PLAYTYPE_BACK ) ;
+						EffectFlag = 1;
+						PlaySoundMem( MHandle[3], DX_PLAYTYPE_BACK);
 					}
-					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
 					{
-						CharacterMove(10,j);
-						EffectFlag = 2;//
+						CharacterMove(10, j);
+						EffectFlag = 2;
 						GameHp--;
 						PlaySound(MHandle[8]);
 					}			
@@ -574,20 +563,20 @@ void CharMove(){
 				break;
 			case 4:
 				if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 && NotesPattern[j] == 4){
-					if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderJust &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderJust)
+					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
 					{
-						CharacterMove(8,j);	
-						EffectFlag = 0;//
+						CharacterMove(8, j);	
+						EffectFlag = 0;
 						GameHp++;
-						PlaySoundMem( MHandle[4] , DX_PLAYTYPE_BACK ) ;
+						PlaySoundMem(MHandle[4], DX_PLAYTYPE_BACK);
 					}
-					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderNear &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderNear)
+					else if(borderGameClick < BorderNear && borderGameClick > -BorderNear)
 					{
-						CharacterMove(9,j);	
+						CharacterMove(9, j);	
 						EffectFlag = 1;
-						PlaySoundMem( MHandle[4] , DX_PLAYTYPE_BACK ) ;
+						PlaySoundMem(MHandle[4], DX_PLAYTYPE_BACK);
 					}
-					else if(PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) < BorderMiss &&PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w) > -BorderMiss)
+					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
 					{
 						CharacterMove(10,j);
 						EffectFlag = 2;
@@ -608,7 +597,7 @@ void CharMove(){
 
 void Game(){	
 	Move();
-	Draw();//描画
+	Draw();
 	CharMove();
 
 	if (GameHp <= 0) {
@@ -638,7 +627,7 @@ void GameOverDraw() {
 
 void ResultUpdate() {
 
-	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1 ) ;        //入力状態をPadに格納
+	int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
 	if (selectResultCount == 0 && Pad & PAD_INPUT_UP) { 
 		PlaySound(MHandle[10]);
@@ -647,7 +636,7 @@ void ResultUpdate() {
 			resultSelectMenu = 0;
 		}
 
-		selectResultCount = 30;
+		selectResultCount = 20;
 	}
 	if(selectResultCount == 0 && Pad & PAD_INPUT_DOWN){
 		PlaySound(MHandle[10]);
@@ -655,7 +644,7 @@ void ResultUpdate() {
 		if (resultSelectMenu > 2) {
 			resultSelectMenu = 2;
 		}
-		selectResultCount = 30;
+		selectResultCount = 20;
 
 	}
 	
@@ -679,7 +668,7 @@ void ResultUpdate() {
 			case 1:
 				Frame =1;
 				OpeiningCount = 0;
-				selectChangeCount = 30;
+				selectChangeCount = 20;
 				break;
 			case 2:
 				Frame = 0;
@@ -730,6 +719,9 @@ void StaffRollDraw() {
 
 }
 
+bool checkGameLoop() {
+	return ProcessMessage() == 0 && CheckHitKey( KEY_INPUT_ESCAPE ) == 0;
+}
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine, int nCmdShow ){
 	DWORD tick;
@@ -737,6 +729,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 	ChangeWindowMode(TRUE);
 	SetMainWindowText("とぶおれ");
 	SetGraphMode(MAX_DISPLAY_SIZE_X, MAX_DISPLAY_SIZE_Y, 16);
+
 	if( DxLib_Init() == -1 )
 	{
 		 return -1;	
@@ -744,7 +737,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 
 	TitleChangeFlg = 0;
 	TitleChangeCount = 0;
-	TitleSelectCount = 30;
+	TitleSelectCount = 20;
 
 	// 描画先画面を裏画面にセット
 	SetDrawScreen( DX_SCREEN_BACK ) ;
@@ -755,7 +748,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 	Load();//画像等読み込み
 
 	// ループ
-	while( ProcessMessage() == 0 && CheckHitKey( KEY_INPUT_ESCAPE ) == 0 ){
+	while(checkGameLoop()){
 
 		Update();//更新
 
