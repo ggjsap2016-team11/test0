@@ -1,5 +1,6 @@
 #include "DxLib.h"
 #include <stdlib.h>
+#include "Title.h"
 
 int Key = -1 ;
 
@@ -35,16 +36,7 @@ int Frame=2;//‰æ–Ê‘JˆÚ
 int GHandle[11];
 int GDrawFlag = 0;
 int BackHandle;
-
-
-int GTitleHandle;
-int GTitleBgHandle;
-int GTitleStartHandle;
-int GTitleStartPushHandle;
 int StageSelectHanele;
-int TitleChangeFlg;
-int TitleChangeCount;
-int TitleSelectCount;
 int PrevScene;
 int WaitTime;
 
@@ -97,7 +89,6 @@ int LevelHandle[6];
 int RBaseHandle;
 int SHandle[2];
 int staffRollH[8];
-int StaffRollCount;
 int MHandle[12];
 
 bool Update(){
@@ -379,50 +370,6 @@ void Draw(){
 		DrawBox( 50 , 0 , MAX_DISPLAY_SIZE_X - 50 ,20  , GetColor( 0 , 150 , 0 ) , TRUE) ;
 	}
     DrawRotaGraph3( 50, 500, 0, 0, ((float)GameHp / 100), 1.0f, 0, PowerBarHandle, TRUE);
-
-}
-
-void TitleDraw() {
-	DrawGraph( 0 , 0, GTitleBgHandle, TRUE);
-	DrawGraph( 0 , 0, GTitleHandle, TRUE);
-	if (TitleChangeFlg == 0) {
-	    DrawGraph( 600, 375, GTitleStartHandle, TRUE);
-	} else {
-		if (TitleChangeCount % 8 >= 5) {
-		    DrawGraph( 600, 375, GTitleStartPushHandle, TRUE);
-		}
-	}
-}
-
-
-void TitleUpdate() {
-
-	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1);
-    if (TitleSelectCount <= 0 && TitleChangeFlg == 0 && (Pad & PAD_INPUT_4) ) {  
-		PlaySoundMem( MHandle[0] , DX_PLAYTYPE_BACK);
-		TitleChangeFlg = 1;
-	}
-
-	if (TitleSelectCount <= 0 && (Pad & PAD_INPUT_L)) {
-		StaffRollCount = 0;
-		Frame = 6;
-		TitleSelectCount = 30;
-	}
-
-	if (TitleChangeFlg == 1) {
-		if (TitleChangeCount >= 120) {
-			Frame = 1;
-			TitleChangeCount = 0;
-			TitleChangeFlg = 0;
-			TitleSelectCount = 30;
-		} else {
-			TitleChangeCount++;
-		}
-	}
-
-	if (Frame == 0 && TitleSelectCount > 0) {
-		TitleSelectCount--;
-	}
 
 }
 
@@ -843,7 +790,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 		switch(Frame){
 			case 0:
 				TitleDraw();
-				TitleUpdate();
+				Frame = TitleUpdate(MHandle[0], Frame);
 				break;
 			case 1:
 				StageSelectUpdate();
