@@ -8,6 +8,8 @@ int TitleChangeFlg;
 int TitleChangeCount;
 int TitleSelectCount;
 int StaffRollCount;
+int OpeiningCount;
+int Opening[4];
 
 void TitleDraw() {
 	DrawGraph( 0 , 0, GTitleBgHandle, TRUE);
@@ -54,3 +56,28 @@ int TitleUpdate(int startPushHandle, int sceneFrame) {
 	return sceneFrame;
 
 }
+
+int OpeningUpdate(int sceneFrame) {
+    int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+    if(OpeiningCount >= 660 || Pad & PAD_INPUT_4 ){
+		sceneFrame = 0;
+		TitleChangeCount = 0;
+		TitleChangeFlg = 0;
+		TitleSelectCount = 30;
+    }
+	return sceneFrame;
+}
+
+void OpeningDraw() {
+	OpeiningCount++;
+	if (OpeiningCount >= 1 && OpeiningCount != 0) {
+		int OpeiningCountFrame = (OpeiningCount / 120); 
+		if ((OpeiningCount / 120) > 3) {
+			OpeiningCountFrame = 3;
+		}
+		DrawGraph(0, 0, Opening[OpeiningCountFrame], TRUE);
+	} else {
+		DrawGraph(0, 0, Opening[0], TRUE);
+	}
+}
+

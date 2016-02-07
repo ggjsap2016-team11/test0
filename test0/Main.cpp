@@ -48,8 +48,6 @@ int NotesPattern[] = {1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,
 ,1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0,-1};//テスト用
 int JudgePattern[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-int Opening[4];
-int OpeiningCount;
 int StageBottom;
 int YourDieH;
 int GameOverCount;
@@ -608,30 +606,6 @@ void CharMove(){
 
 }
 
-void OpeningUpdate() {
-    int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-    if(OpeiningCount >= 660 || Pad & PAD_INPUT_4 ){
-		Frame = 0;
-		TitleChangeCount = 0;
-		TitleChangeFlg = 0;
-		TitleSelectCount = 30;
-    }
-}
-
-void OpeningDraw() {
-	OpeiningCount++;
-	if (OpeiningCount >= 1 && OpeiningCount != 0) {
-		int OpeiningCountFrame = (OpeiningCount / 120); 
-		if ((OpeiningCount / 120) > 3) {
-			OpeiningCountFrame = 3;
-		}
-		DrawGraph(0, 0, Opening[OpeiningCountFrame], TRUE);
-	} else {
-		DrawGraph(0, 0, Opening[0], TRUE);
-	}
-}
-
-
 void Game(){	
 	Move();
 	Draw();//描画
@@ -797,7 +771,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 				StageSelectDraw();
 				break;
 			case 2:
-				OpeningUpdate();
+				Frame = OpeningUpdate(Frame);
 				OpeningDraw();
 				break;
 			case 3:
