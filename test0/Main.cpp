@@ -208,8 +208,8 @@ void Load(){
 	RBaseHandle = LoadGraph("Image/result_title.png");
 
 	//‹È	
-	SHandle[0] = LoadSoundMem("Sound/GGJ_music1BPM120.wav");
-	SHandle[1] = LoadSoundMem("Sound/GGJ_music2completedBPM135.wav");
+	SHandle[0] = LoadSoundMem("Sound/GGJ_music1BPM120.ogg");
+	SHandle[1] = LoadSoundMem("Sound/GGJ_music2completedBPM135.ogg");
 
 	MusicTime[0] = 77;
 	MusicTime[1] = 62;
@@ -781,6 +781,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 	SetWindowIconID(MAINICON);
 	SetMainWindowText("‚Æ‚Ô‚¨‚ê");
 	SetGraphMode(MAX_DISPLAY_SIZE_X, MAX_DISPLAY_SIZE_Y, 16);
+	SetOutApplicationLogValidFlag(FALSE);
+	SetDXArchiveKeyString("puka1203");
 
 	if( DxLib_Init() == -1 )
 	{
