@@ -81,13 +81,15 @@ int resultMenuY[3] = {335, 400, 470};
 int resultSelectMenu = 0;
 int selectResultCount = 0;
 int EffectHandle[3];
-int GameHandle[2];
+int GameHandle[3];
 int PowerBarHandle;
 int LevelHandle[6];
 int RBaseHandle;
 int SHandle[2];
 int staffRollH[8];
 int MHandle[12];
+int GamePlayStart=0;
+int GamePlayAnim=0;
 int GameOverStart=0;
 int GameOverAnim=0;
 int GameClearStart=0;
@@ -182,6 +184,7 @@ void Load(){
 
 	GameHandle[0] = LoadGraph("Image/gameClear.png");
 	GameHandle[1] = LoadGraph("Image/gameOver.png");
+	GameHandle[2] = LoadGraph("Image/gameStart.png");
 	
 	PowerBarHandle = LoadGraph("Image/HitPointBar.png");
 	
@@ -248,7 +251,6 @@ void setDanceEval() {
 	} else {
 		danceeVal = 0;
 	}
-	StopSoundMem(SHandle[selectMode]);
 	PlaySound(MHandle[7]);
 
 }
@@ -303,6 +305,22 @@ void PlayIni(){
 
 
 void Move(){
+
+	if (GamePlayStart == 0) {
+		GamePlayAnim++;
+	}
+
+	if (GamePlayStart == 0 && GamePlayAnim > 150) {
+		GamePlayStart = 1;
+		GamePlayAnim = 0;
+		PlaySoundMem(SHandle[selectMode] , DX_PLAYTYPE_BACK);
+	}
+	
+	if (GamePlayStart == 0) {
+		return;
+	}
+
+
 	// ノーツの移動処理
 	for (int j = 0 ; j < MAX_NOTES ; j ++ ){
 		// ノーツデータが無効だったらスキップ
@@ -392,6 +410,9 @@ void Draw(){
 		DrawGraph(310, 120, GameHandle[0], TRUE);
 	}
 
+	if (GamePlayStart == 0 && GamePlayAnim > 30 && GamePlayAnim % 5 < 4) {
+		DrawGraph(310, 120, GameHandle[2], TRUE);
+	}
 
 
 }
@@ -402,11 +423,12 @@ void MainGameInit() {
 	GameHp = 50;
 	danceeVal = 0;
 	danceScore = 0;
+	GamePlayStart = 0;
+	GamePlayAnim = 0;
 	GameOverStart = 0;
 	GameOverAnim = 0;
 	GameClearStart = 0;
 	GameClearAnim = 0;
-	PlaySoundMem(SHandle[selectMode] , DX_PLAYTYPE_BACK);
 	Frame=3;//ゲーム画面に遷移                    
 }
 
