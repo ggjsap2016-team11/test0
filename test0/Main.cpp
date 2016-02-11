@@ -1,8 +1,9 @@
 #include "DxLib.h"
 #include <stdlib.h>
 #include "Title.h"
+#include "resource.h"
 
-int Key = -1 ;
+int Key = -1;
 
 // ÉmÅ[ÉcÇÃç≈ëÂêî
 #define MAX_NOTES 300
@@ -777,6 +778,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 	DWORD tick;
 
 	ChangeWindowMode(TRUE);
+	SetWindowIconID(MAINICON);
 	SetMainWindowText("Ç∆Ç‘Ç®ÇÍ");
 	SetGraphMode(MAX_DISPLAY_SIZE_X, MAX_DISPLAY_SIZE_Y, 16);
 
