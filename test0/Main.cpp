@@ -430,6 +430,7 @@ void MainGameInit() {
 	GameOverAnim = 0;
 	GameClearStart = 0;
 	GameClearAnim = 0;
+	selectStageNumber = selectMode;
 	Frame=3;//ƒQ[ƒ€‰æ–Ê‚É‘JˆÚ                    
 }
 
