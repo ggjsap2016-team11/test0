@@ -45,8 +45,12 @@ int GameCnt;//ゲームカウント
 
 int MusicTime[2];
 
-int NotesPattern[] = {1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0,1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0
-,1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0};
+int NotesPattern[][121] = {
+	{1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0,1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0
+,1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0},
+	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+};
 int JudgePattern[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 ,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 int StageBottom;
@@ -70,9 +74,9 @@ int selectCursorH;
 int g_judgenumber;
 const int Tama_h =40;
 const int Tama_w =40;
-const int BorderJust = 20;
-const int BorderNear = 50;
-const int BorderMiss = 100;
+const int BorderJusts[3] = {60, 40, 20};
+const int BorderNears[3] = {90, 70 ,50};
+const int BorderMisss[3] = {140, 120, 100};
 int DecisionEffect[3];
 int EffectFlag = 4;
 int EffectSizeHalf = 75;
@@ -258,20 +262,20 @@ void setDanceEval() {
 
 void SetNotes(){
 	//ノーツ発生
-	for(int k=0; k <sizeof NotesPattern/sizeof(int) ;k++){
-		if(NotesPattern[k] != 0){
+	for(int k=0; k <sizeof NotesPattern[selectStageNumber]/sizeof(int) ;k++){
+		if( NotesPattern[selectStageNumber][k] != 0){
 			// ショットの位置を設定
-			NotesX[ k ] = MAX_DISPLAY_SIZE_X -60+ k*(5*FPS) ;
-			NotesY[ k ] = 400 ;
+			NotesX[ k ] = MAX_DISPLAY_SIZE_X -60+ k*(5*FPS);
+			NotesY[ k ] = 400;
 			// ノーツデータを使用中にセット
-			Notes[k] = NotesPattern[k];
+			Notes[k] = NotesPattern[selectStageNumber][k];
 		}
 	}
 
 	g_judgenumber = 0;
-	for(int l = 0; l < sizeof(NotesPattern) /sizeof(int);l++){
-		if(NotesPattern[l] != 0){
-			JudgePattern[g_judgenumber] = NotesPattern[l];
+	for(int l = 0; l < sizeof(NotesPattern[selectStageNumber]) /sizeof(int);l++){
+		if(NotesPattern[selectStageNumber][l] != 0){
+			JudgePattern[g_judgenumber] = NotesPattern[selectStageNumber][l];
 			g_judgenumber++;
 		}
 	}
@@ -387,7 +391,7 @@ void Draw(){
 	for(int j = 0 ; j < MAX_NOTES ; j ++ ){
 		// ノーツデータが有効な時のみ描画
 		if( Notes[j] != 0 ) {
-			DrawGraph( NotesX[j] + FpsDelayCnt*10 , NotesY[j] , CurSor[NotesPattern[j]] , TRUE);		
+			DrawGraph( NotesX[j] + FpsDelayCnt*10 , NotesY[j] , CurSor[NotesPattern[selectStageNumber][j]] , TRUE);		
 		}
 	}
 
@@ -554,11 +558,14 @@ void CharMove(){
 	} else if(cnt % 30 == 0) {
 		GDrawFlag = 1;
 	}
-	for(int j=0; j <sizeof NotesPattern/sizeof(int) ;j++){
-		float borderGameClick = PlayerX+PlayerSizeX/2-(NotesX[j] + Tama_w);
+	int BorderJust = BorderJusts[selectStageDif];
+	int BorderNear = BorderNears[selectStageDif];
+	int BorderMiss = BorderMisss[selectStageDif];
+	for(int j=0; j <sizeof NotesPattern[selectStageNumber]/sizeof(int) ;j++){
+		float borderGameClick = PlayerX+PlayerSizeX/2-(NotesX[j]) - 10;
 		switch(JudgePattern[g_judgenumber]){
 			case 1:
-				if ((Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2) && NotesPattern[j] == 1)
+				if ((Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2) && NotesPattern[selectStageNumber][j] == 1)
 				{ 	
 					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
 					{
@@ -580,7 +587,7 @@ void CharMove(){
 				}
 				break;
 			case 2:
-				if((Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4)&&NotesPattern[j] == 2){
+				if((Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4)&&NotesPattern[selectStageNumber][j] == 2){
 					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
 					{
 						CharacterMove(4, j);		
@@ -601,7 +608,7 @@ void CharMove(){
 				}
 				break;
 			case 3:
-				if( (Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3) &&NotesPattern[j] == 3){
+				if( (Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3) &&NotesPattern[selectStageNumber][j] == 3){
 					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
 					{
 						CharacterMove(6, j);
@@ -622,7 +629,7 @@ void CharMove(){
 				}
 				break;
 			case 4:
-				if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 && NotesPattern[j] == 4){
+				if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 && NotesPattern[selectStageNumber][j] == 4){
 					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
 					{
 						CharacterMove(8, j);	
