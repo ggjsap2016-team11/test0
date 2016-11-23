@@ -13,11 +13,15 @@ int Key = -1;
 #define MAX_DISPLAY_SIZE_Y 540
 
 
-int Notes[ MAX_NOTES ] ;	// ノーツが存在するか、フラグ
-double NotesX[ MAX_NOTES ] ,NotesY[ MAX_NOTES ] ;	// ノーツの位置
-double Hit[ MAX_NOTES ];//判定対象のノーツ
+// ノーツが存在するか、フラグ
+int Notes[MAX_NOTES];	
+// ノーツの位置
+double NotesX[MAX_NOTES] ,NotesY[MAX_NOTES];
+//判定対象のノーツ
+double Hit[ MAX_NOTES ];
 
-int PlayerX , PlayerY ;	// プレイヤーの位置
+// プレイヤーの位置
+int PlayerX , PlayerY;	
 int PlayerSizeX,PlayerSizeY;
 int NotesSizeX,NotesSizeY;
 
@@ -27,11 +31,13 @@ static float mFps;          //fps
 static const int N = 60;	//平均を取るサンプル数
 static const int FPS = 60;	//設定したFPS
 static int GameHp = 50;
-float FpsDelayCnt;
 const int GameLineColor = GetColor(0 ,150 ,0 ); 
-int cnt = 0;//起動時からのカウント
 
-int Frame=2;//画面遷移
+//起動時からのカウント
+int cnt = 0;
+
+//画面遷移
+int Frame=2;
 
 
 int GHandle[11];
@@ -45,14 +51,128 @@ int GameCnt;//ゲームカウント
 
 int MusicTime[2];
 
-int NotesPattern[][121] = {
-	{1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0,1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0
-,1,2,1,0,3,4,3,0,1,0,2,0,3,0,4,0,4,3,2,1,2,3,1,4,0,0,1,3,2,4,0,0,1,2,3,4,1,2,3,0},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+int NotesPattern[][3][121] = {
+	{
+		{
+			1,2,1,0,3,4,3,0,
+			1,0,2,0,3,0,4,0,
+			4,3,2,1,2,3,1,4,
+			0,0,1,3,2,4,0,0,
+			1,2,3,4,1,2,3,0,
+			1,2,1,0,3,4,3,0,
+			1,0,2,0,3,0,4,0,
+			4,3,2,1,2,3,1,4,
+			0,0,1,3,2,4,0,0,
+			1,2,3,4,1,2,3,0,
+			1,2,1,0,3,4,3,0,
+			1,0,2,0,3,0,4,0,
+			4,3,2,1,2,3,1,4,
+			0,0,1,3,2,4,0,0,
+			1,2,3,4,1,2,3,0
+		},
+		{
+			1,4,4,4,3,4,3,0,
+			1,0,2,0,3,0,4,0,
+			4,3,2,1,2,3,1,4,
+			0,0,1,3,2,4,0,0,
+			1,2,3,4,1,2,3,0,
+			1,2,1,0,3,4,3,0,
+			1,0,2,0,3,0,4,0,
+			4,3,2,1,2,3,1,4,
+			0,0,1,3,2,4,0,0,
+			1,2,3,4,1,2,3,0,
+			1,2,1,0,3,4,3,4,
+			1,4,2,4,3,0,4,0,
+			4,3,2,1,2,3,1,4,
+			0,0,1,3,2,4,0,0,
+			1,2,3,4,1,2,3,0
+		},
+		{
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1
+		}
+	},
+	{
+		{
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1
+		},
+		{
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1
+		},
+		{
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1,
+			1,1,1,1,1,1,1,1
+		}
+	}
 };
-int JudgePattern[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+int JudgePattern[] = 
+	{
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0
+	};
 int StageBottom;
 int YourDieH;
 int GameOverCount;
@@ -71,12 +191,12 @@ int selectChangeCount = 0;
 int stageBackH[2];
 int selectModeH[3];
 int selectCursorH;
-int g_judgenumber;
+int g_judgenumber = 0;
 const int Tama_h =40;
 const int Tama_w =40;
 const int BorderJusts[3] = {60, 40, 20};
-const int BorderNears[3] = {90, 70 ,50};
-const int BorderMisss[3] = {140, 120, 100};
+const int BorderNears[3] = {90, 70 , 50};
+const int BorderMisss[3] = {120, 100, 80};
 int DecisionEffect[3];
 int EffectFlag = 4;
 int EffectSizeHalf = 75;
@@ -101,10 +221,12 @@ int GameClearStart=0;
 int GameClearAnim=0;
 
 bool Update(){
-	if( mCount == 0 ){ //1フレーム目なら時刻を記憶
+	if( mCount == 0 ){ 
+		//1フレーム目なら時刻を記憶
 		mStartTime = GetNowCount();
 	}
-	if( mCount == N ){ //60フレーム目なら平均を計算する
+	if( mCount == N ){ 
+		//60フレーム目なら平均を計算する
 		int t = GetNowCount();
 		mFps = 1000.f/((t-mStartTime)/(float)N);
 		mCount = 0;
@@ -262,24 +384,25 @@ void setDanceEval() {
 
 void SetNotes(){
 	//ノーツ発生
-	for(int k=0; k <sizeof NotesPattern[selectStageNumber]/sizeof(int) ;k++){
-		if( NotesPattern[selectStageNumber][k] != 0){
-			// ショットの位置を設定
-			NotesX[ k ] = MAX_DISPLAY_SIZE_X -60+ k*(5*FPS);
-			NotesY[ k ] = 400;
-			// ノーツデータを使用中にセット
-			Notes[k] = NotesPattern[selectStageNumber][k];
-		}
+	int selectNotesPattern[121];
+	int selectNoteLen = sizeof selectNotesPattern/sizeof(int);
+
+	for(int i=0; i < selectNoteLen ;i++){
+		selectNotesPattern[i] = NotesPattern[selectStageNumber][selectStageDif][i];
 	}
 
-	g_judgenumber = 0;
-	for(int l = 0; l < sizeof(NotesPattern[selectStageNumber]) /sizeof(int);l++){
-		if(NotesPattern[selectStageNumber][l] != 0){
-			JudgePattern[g_judgenumber] = NotesPattern[selectStageNumber][l];
-			g_judgenumber++;
-		}
+	for (int i = 0; i < selectNoteLen ; i++) {
+		// ショットの位置を設定
+		NotesX[i] = MAX_DISPLAY_SIZE_X - 60 +  i * (5 * FPS);
+		NotesY[i] = 400;
+			
+		// ノーツデータを使用中にセット
+		Notes[i] = selectNotesPattern[i];
+
+		JudgePattern[i] = selectNotesPattern[i];
+
 	}
-	g_judgenumber = 0;
+
 }
 
 void PlayIni(){
@@ -292,8 +415,8 @@ void PlayIni(){
 
 	// ノーツの存在を初期化する
 	for(int i = 0 ; i < MAX_NOTES ; i ++ ){
-		Notes[ i ] = 0 ;
-		Hit[ i ] = 0;
+		Notes[i] = 0 ;
+		Hit[i] = 0;
 	}
 
 
@@ -301,9 +424,9 @@ void PlayIni(){
 	NotesSizeY = 50;
 	
 	GameCnt=0;
-
-	FpsDelayCnt=0;
-	SetNotes();//譜面セット
+	GamePlayStart = 0;
+	//譜面セット
+	SetNotes();
 	
 }
 
@@ -318,6 +441,7 @@ void Move(){
 	if (GamePlayStart == 0 && GamePlayAnim > 150) {
 		GamePlayStart = 1;
 		GamePlayAnim = 0;
+		g_judgenumber = 0;
 		PlaySoundMem(SHandle[selectMode] , DX_PLAYTYPE_BACK);
 	}
 	
@@ -328,19 +452,20 @@ void Move(){
 
 	// ノーツの移動処理
 	for (int j = 0 ; j < MAX_NOTES ; j ++ ){
-		// ノーツデータが無効だったらスキップ
-		if( Notes[ j ] == 0 ) continue ;
 
 		// 左に移動
-		NotesX[ j ] -= 10 ;
+		NotesX[ j ] -= 10;
 
 		// 画面外に出ていたら無効にする
-		if( NotesX[ j ] < -50 ){
-			Notes[j] = 0;
+		if( NotesX[j] < -10 && -1 < Notes[j] && j < 121){
 			NotesX[j] = 1000;
 			g_judgenumber++;
-			GameHp--;
-			PlaySound(MHandle[8]);
+			if( 0 < Notes[j] ) {
+				GDrawFlag = 10;
+				GameHp--;
+				PlaySound(MHandle[8]);
+			}
+			Notes[j] = -1;
 		}
 	}
 
@@ -369,14 +494,9 @@ void Draw(){
 	// 背景背景
 	DrawGraph(0, 0, stageBackH[selectStageNumber], TRUE);
 	DrawGraph(0, 0, StageBottom, TRUE);
-	//プレイヤー描画
-	
-	DrawGraph(PlayerX, PlayerY, GHandle[GDrawFlag], TRUE);
 
-	//fpsを表示
-	if(mFps != 60 ){
-		FpsDelayCnt-=(60.0f-mFps) / 60.0f;
-	}
+	//プレイヤー描画
+	DrawGraph(PlayerX, PlayerY, GHandle[GDrawFlag], TRUE);
 
 	if(EffectFlag != 4 && EffectTimer <=10){
 		DrawGraph((PlayerX+PlayerSizeX/2) - EffectSizeHalf,365,DecisionEffect[EffectFlag],TRUE);
@@ -390,27 +510,30 @@ void Draw(){
 	// ノーツを描画する
 	for(int j = 0 ; j < MAX_NOTES ; j ++ ){
 		// ノーツデータが有効な時のみ描画
-		if( Notes[j] != 0 ) {
-			DrawGraph( NotesX[j] + FpsDelayCnt*10 , NotesY[j] , CurSor[NotesPattern[selectStageNumber][j]] , TRUE);		
+		if( 1 <= Notes[j] ) {
+			DrawGraph( NotesX[j], NotesY[j] , CurSor[NotesPattern[selectStageNumber][selectStageDif][j]] , TRUE);		
 		}
 	}
 
 	
 	//曲の現在位置
-
-	DrawBox(50 ,0 ,MAX_DISPLAY_SIZE_X - 50 ,20 , GameLineColor, FALSE) ;
+	DrawBox(50 , 0 , MAX_DISPLAY_SIZE_X - 50 , 20 , GameLineColor, FALSE);
+	
 	float drawBoxCheckValue = (float)(GameCnt/60)/MusicTime[selectMode];
 	if(drawBoxCheckValue < 1){
 		DrawBox( 50 , 0 , 50 + ( MAX_DISPLAY_SIZE_X - 100 )*( (float)(GameCnt)/(MusicTime[selectMode]*60) ), 20 , GameLineColor, TRUE);
 	}else if(drawBoxCheckValue >= 1){
 		DrawBox( 50 , 0 , MAX_DISPLAY_SIZE_X - 50, 20 , GameLineColor , TRUE);
 	}
+
 	if (GameHp > 0) {
 		DrawRotaGraph3( 50, 500, 0, 0, ((float)GameHp / 100), 1.0f, 0, PowerBarHandle, TRUE);
 	}
+
 	if (GameOverStart == 1 && GameOverAnim % 5 < 4) {
 		DrawGraph(310, 120, GameHandle[1], TRUE);
 	}
+
 	if (GameClearStart == 1 && GameClearAnim % 5 < 4) {
 		DrawGraph(310, 120, GameHandle[0], TRUE);
 	}
@@ -418,7 +541,6 @@ void Draw(){
 	if (GamePlayStart == 0 && GamePlayAnim > 30 && GamePlayAnim % 5 < 4) {
 		DrawGraph(310, 120, GameHandle[2], TRUE);
 	}
-
 
 }
 
@@ -435,7 +557,9 @@ void MainGameInit() {
 	GameClearStart = 0;
 	GameClearAnim = 0;
 	selectStageNumber = selectMode;
-	Frame=3;//ゲーム画面に遷移                    
+	
+	//ゲーム画面に遷移
+	Frame=3;                    
 }
 
 
@@ -535,7 +659,7 @@ void StageSelectDraw() {
 void CharacterMove(int ComandNumber,int ObjectNumber)
 {
 	GDrawFlag = ComandNumber;
-	Notes[ObjectNumber] = 0;
+	Notes[ObjectNumber] = -1;
 	NotesX[ObjectNumber] = 1000;
 	g_judgenumber++;
 	cnt = 0;
@@ -549,6 +673,125 @@ void CharacterMiss(int ObjectNumber) {
 	PlaySound(MHandle[8]);
 }
 
+
+
+int getBorderClickValue(int borderGameClick, int BorderJust, int BorderNear, int BorderMiss) {
+
+	if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
+	{
+		return 0;
+	}
+	else if(borderGameClick < BorderNear && borderGameClick > -BorderNear)
+	{
+		return 1;
+
+	}
+	else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
+	{
+		return 2;
+	}			
+}
+
+
+
+void CheckInputUpJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear, int BorderMiss) {
+	if ((Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2) && selectNotesPattern == 1)
+	{ 	
+		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear, BorderMiss);		
+		if(borderClickType == 0)
+		{
+			CharacterMove(2, i);		
+			EffectFlag = 0;
+			GameHp++;
+			PlaySound(MHandle[6]);
+		}
+		else if(borderClickType ==1)
+		{
+			CharacterMove(3, i);		
+			EffectFlag = 1;
+			PlaySound(MHandle[6]);
+		}
+		else if(borderClickType == 2)
+		{
+			CharacterMiss(i);
+		}
+	}
+
+}
+
+void CheckInputRightJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear, int BorderMiss) {
+	if((Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4) && selectNotesPattern == 2){
+		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear, BorderMiss);		
+		if (borderClickType == 0)
+		{
+			CharacterMove(4, i);		
+			EffectFlag = 0;
+			GameHp++;
+			PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK);
+		}
+		else if(borderClickType == 1)
+		{
+			CharacterMove(5, i);		
+			EffectFlag = 1;
+			PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK);
+		}
+		else if(borderClickType == 2)
+		{
+			CharacterMiss(i);
+		}			
+	}
+
+}
+
+void CheckInputDownJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear, int BorderMiss) {
+
+	if( (Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3) && selectNotesPattern == 3){
+		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear, BorderMiss);
+		if (borderClickType == 0)
+		{
+			CharacterMove(6, i);
+			EffectFlag = 0;
+			GameHp++;
+			PlaySoundMem( MHandle[3] , DX_PLAYTYPE_BACK);
+		}
+		else if (borderClickType == 1)
+		{
+			CharacterMove(7, i);		
+			EffectFlag = 1;
+			PlaySoundMem( MHandle[3], DX_PLAYTYPE_BACK);
+		}
+		else if(borderClickType == 2)
+		{
+			CharacterMiss(i);
+		}			
+	}
+}
+
+
+void CheckInputLeftJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear, int BorderMiss) {
+	if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 && selectNotesPattern == 4){
+		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear, BorderMiss);
+		if (borderClickType == 0)
+		{
+			CharacterMove(8, i);	
+			EffectFlag = 0;
+			GameHp++;
+			PlaySoundMem(MHandle[4], DX_PLAYTYPE_BACK);
+		}
+		else if(borderClickType == 1)
+		{
+			CharacterMove(9, i);	
+			EffectFlag = 1;
+			PlaySoundMem(MHandle[4], DX_PLAYTYPE_BACK);
+		}
+		else if (borderClickType == 2)
+		{
+			CharacterMiss(i);
+		}			
+	}
+}
+
+
 void CharMove(){
 	int Pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 	
@@ -561,105 +804,34 @@ void CharMove(){
 	int BorderJust = BorderJusts[selectStageDif];
 	int BorderNear = BorderNears[selectStageDif];
 	int BorderMiss = BorderMisss[selectStageDif];
-	for(int j=0; j <sizeof NotesPattern[selectStageNumber]/sizeof(int) ;j++){
-		float borderGameClick = PlayerX+PlayerSizeX/2-(NotesX[j]) - 10;
-		switch(JudgePattern[g_judgenumber]){
-			case 1:
-				if ((Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2) && NotesPattern[selectStageNumber][j] == 1)
-				{ 	
-					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
-					{
-						CharacterMove(2,j);		
-						EffectFlag = 0;
-						GameHp++;
-						PlaySound(MHandle[6]);
-					}
-					else if(borderGameClick < BorderNear && borderGameClick > -BorderNear)
-					{
-						CharacterMove(3,j);		
-						EffectFlag = 1;
-						PlaySound(MHandle[6]);
-					}
-					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
-					{
-						CharacterMiss(j);
-					}
-				}
-				break;
-			case 2:
-				if((Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4)&&NotesPattern[selectStageNumber][j] == 2){
-					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
-					{
-						CharacterMove(4, j);		
-						EffectFlag = 0;
-						GameHp++;
-						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK);
-					}
-					else if(borderGameClick < BorderNear && borderGameClick > -BorderNear)
-					{
-						CharacterMove(5, j);		
-						EffectFlag = 1;
-						PlaySoundMem( MHandle[5] , DX_PLAYTYPE_BACK);
-					}
-					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
-					{
-						CharacterMiss(j);
-					}			
-				}
-				break;
-			case 3:
-				if( (Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3) &&NotesPattern[selectStageNumber][j] == 3){
-					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
-					{
-						CharacterMove(6, j);
-						EffectFlag = 0;
-						GameHp++;
-						PlaySoundMem( MHandle[3] , DX_PLAYTYPE_BACK);
-					}
-					else if(borderGameClick < BorderNear && borderGameClick > -BorderNear)
-					{
-						CharacterMove(7,j);		
-						EffectFlag = 1;
-						PlaySoundMem( MHandle[3], DX_PLAYTYPE_BACK);
-					}
-					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
-					{
-						CharacterMiss(j);
-					}			
-				}
-				break;
-			case 4:
-				if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 && NotesPattern[selectStageNumber][j] == 4){
-					if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
-					{
-						CharacterMove(8, j);	
-						EffectFlag = 0;
-						GameHp++;
-						PlaySoundMem(MHandle[4], DX_PLAYTYPE_BACK);
-					}
-					else if(borderGameClick < BorderNear && borderGameClick > -BorderNear)
-					{
-						CharacterMove(9, j);	
-						EffectFlag = 1;
-						PlaySoundMem(MHandle[4], DX_PLAYTYPE_BACK);
-					}
-					else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
-					{
-						CharacterMiss(j);
-					}			
-				}
-				break;
-			default:
-				if (GameClearStart == 0) {
-					GameClearStart = 1;
-					PlaySound(MHandle[1]);
-				}
-				break;
+	int selectNotesLen = sizeof NotesPattern[selectStageNumber][selectStageDif]/sizeof(int);
+	int selectNotesPattern[121];
 
-		}
+	for (int i = 0; i < selectNotesLen; i++) {
+		selectNotesPattern[i] = NotesPattern[selectStageNumber][selectStageDif][i];
+	}
+
+
+	int selectJudgePattern = JudgePattern[g_judgenumber];
+	float borderGameClick = PlayerX+PlayerSizeX / 2-(NotesX[g_judgenumber]) - 10;
+	switch(selectJudgePattern){
+		case 1:
+			CheckInputUpJudge(Pad, selectJudgePattern, g_judgenumber, borderGameClick, BorderJust, BorderNear, BorderMiss);
+			break;
+		case 2:
+			CheckInputRightJudge(Pad, selectJudgePattern, g_judgenumber, borderGameClick, BorderJust, BorderNear, BorderMiss);
+			break;
+		case 3:
+			CheckInputDownJudge(Pad, selectJudgePattern, g_judgenumber, borderGameClick, BorderJust, BorderNear, BorderMiss);
+			break;
+		case 4:
+			CheckInputLeftJudge(Pad,selectJudgePattern, g_judgenumber, borderGameClick, BorderJust, BorderNear, BorderMiss);
+			break;
+
 	}
 
 }
+
 
 void Game(){	
 	Move();
@@ -669,6 +841,12 @@ void Game(){
 	if (GameHp <= 0 && GameOverStart == 0) {
 		PlaySound(MHandle[9]);
 		GameOverStart = 1;
+	} else if (0 < GameHp && GameClearStart == 0 && 121 <= g_judgenumber ) {
+		GameClearStart = 1;
+		PlaySound(MHandle[1]);
+	}
+	if (GameOverStart == 1 || GameClearStart == 1) {
+		g_judgenumber = 0;
 	}
 
 }
@@ -682,6 +860,8 @@ void GameOverUpdate() {
 		setDanceEval();
 		Frame=5;
 	}
+
+
 }
 
 
@@ -755,7 +935,8 @@ void ResultDraw() {
 
 void StaffRollUpdate() {
 
-	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1);        //入力状態をPadに格納
+	//入力状態をPadに格納
+	int Pad = GetJoypadInputState( DX_INPUT_KEY_PAD1);        
 
 	if (Pad & PAD_INPUT_4) { 
 		Frame = 0;
@@ -812,10 +993,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,LPSTR lpCmdLine
 	// ループ
 	while(checkGameLoop()){
 
-		Update();//更新
+		//更新
+		Update();
 
 		// 画面を初期化する
-		ClearDrawScreen() ;
+		ClearDrawScreen();
 		switch(Frame){
 			case 0:
 				TitleDraw();
