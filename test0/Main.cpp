@@ -933,6 +933,10 @@ void ResultUpdate() {
 
 void ResultDraw() {
 
+	if (Frame != 5) {
+		return;
+	}
+
 	DrawGraph(0, 0, danceEvalH[danceeVal], TRUE);
 	DrawGraph(0, 0, danceEvalScoreH[danceeVal], TRUE);
 	for (int i = 0; i < 3; i++) {
