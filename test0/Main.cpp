@@ -194,9 +194,9 @@ int selectCursorH;
 int g_judgenumber = 0;
 const int Tama_h =40;
 const int Tama_w =40;
-const int BorderJusts[3] = {60, 40, 20};
-const int BorderNears[3] = {90, 70 , 50};
-const int BorderMisss[3] = {120, 100, 80};
+const int BorderJusts[3] = {20, 10, 5};
+const int BorderNears[3] = {40, 60 , 10};
+const int BorderMisss[3] = {60, 70, 30};
 int DecisionEffect[3];
 int EffectFlag = 4;
 int EffectSizeHalf = 75;
@@ -393,7 +393,7 @@ void SetNotes(){
 
 	for (int i = 0; i < selectNoteLen ; i++) {
 		// ショットの位置を設定
-		NotesX[i] = MAX_DISPLAY_SIZE_X - 60 +  i * (5 * FPS);
+		NotesX[i] = MAX_DISPLAY_SIZE_X - 60 +  (i * 75);
 		NotesY[i] = 400;
 			
 		// ノーツデータを使用中にセット
@@ -402,7 +402,6 @@ void SetNotes(){
 		JudgePattern[i] = selectNotesPattern[i];
 
 	}
-
 }
 
 void PlayIni(){
@@ -453,12 +452,16 @@ void Move(){
 	// ノーツの移動処理
 	for (int j = 0 ; j < MAX_NOTES ; j ++ ){
 
+		if (NotesX[j] == -3000) {
+			continue;
+		}
+
 		// 左に移動
-		NotesX[ j ] -= 10;
+		NotesX[ j ] -= 5;
 
 		// 画面外に出ていたら無効にする
 		if( NotesX[j] < -10 && -1 < Notes[j] && j < 121){
-			NotesX[j] = 1000;
+			NotesX[j] = -3000;
 			g_judgenumber++;
 			if( 0 < Notes[j] ) {
 				GDrawFlag = 10;
@@ -660,7 +663,7 @@ void CharacterMove(int ComandNumber,int ObjectNumber)
 {
 	GDrawFlag = ComandNumber;
 	Notes[ObjectNumber] = -1;
-	NotesX[ObjectNumber] = 1000;
+	NotesX[ObjectNumber] = -3000;
 	g_judgenumber++;
 	cnt = 0;
 
@@ -675,18 +678,18 @@ void CharacterMiss(int ObjectNumber) {
 
 
 
-int getBorderClickValue(int borderGameClick, int BorderJust, int BorderNear, int BorderMiss) {
+int getBorderClickValue(int borderGameClick, int BorderJust, int BorderNear) {
 
 	if(borderGameClick < BorderJust && borderGameClick > -BorderJust)
 	{
 		return 0;
 	}
-	else if(borderGameClick < BorderNear && borderGameClick > -BorderNear)
+	else if(BorderJust < borderGameClick < BorderNear || -BorderJust > borderGameClick > -BorderNear)
 	{
 		return 1;
 
 	}
-	else if(borderGameClick < BorderMiss && borderGameClick > -BorderMiss)
+	else
 	{
 		return 2;
 	}			
@@ -694,10 +697,10 @@ int getBorderClickValue(int borderGameClick, int BorderJust, int BorderNear, int
 
 
 
-void CheckInputUpJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear, int BorderMiss) {
+void CheckInputUpJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear) {
 	if ((Pad & PAD_INPUT_UP  || Pad & PAD_INPUT_2) && selectNotesPattern == 1)
 	{ 	
-		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear, BorderMiss);		
+		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear);		
 		if(borderClickType == 0)
 		{
 			CharacterMove(2, i);		
@@ -719,9 +722,9 @@ void CheckInputUpJudge(int Pad, int selectNotesPattern, int i, int borderGameCli
 
 }
 
-void CheckInputRightJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear, int BorderMiss) {
+void CheckInputRightJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear) {
 	if((Pad & PAD_INPUT_RIGHT  || Pad & PAD_INPUT_4) && selectNotesPattern == 2){
-		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear, BorderMiss);		
+		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear);		
 		if (borderClickType == 0)
 		{
 			CharacterMove(4, i);		
@@ -743,10 +746,10 @@ void CheckInputRightJudge(int Pad, int selectNotesPattern, int i, int borderGame
 
 }
 
-void CheckInputDownJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear, int BorderMiss) {
+void CheckInputDownJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear) {
 
 	if( (Pad & PAD_INPUT_DOWN  || Pad & PAD_INPUT_3) && selectNotesPattern == 3){
-		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear, BorderMiss);
+		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear);
 		if (borderClickType == 0)
 		{
 			CharacterMove(6, i);
@@ -768,9 +771,9 @@ void CheckInputDownJudge(int Pad, int selectNotesPattern, int i, int borderGameC
 }
 
 
-void CheckInputLeftJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear, int BorderMiss) {
+void CheckInputLeftJudge(int Pad, int selectNotesPattern, int i, int borderGameClick, int BorderJust, int BorderNear) {
 	if( Pad & PAD_INPUT_LEFT || Pad & PAD_INPUT_1 && selectNotesPattern == 4){
-		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear, BorderMiss);
+		int borderClickType = getBorderClickValue(borderGameClick, BorderJust, BorderNear);
 		if (borderClickType == 0)
 		{
 			CharacterMove(8, i);	
@@ -812,22 +815,30 @@ void CharMove(){
 	}
 
 
-	int selectJudgePattern = JudgePattern[g_judgenumber];
-	float borderGameClick = PlayerX+PlayerSizeX / 2-(NotesX[g_judgenumber]) - 10;
-	switch(selectJudgePattern){
-		case 1:
-			CheckInputUpJudge(Pad, selectJudgePattern, g_judgenumber, borderGameClick, BorderJust, BorderNear, BorderMiss);
-			break;
-		case 2:
-			CheckInputRightJudge(Pad, selectJudgePattern, g_judgenumber, borderGameClick, BorderJust, BorderNear, BorderMiss);
-			break;
-		case 3:
-			CheckInputDownJudge(Pad, selectJudgePattern, g_judgenumber, borderGameClick, BorderJust, BorderNear, BorderMiss);
-			break;
-		case 4:
-			CheckInputLeftJudge(Pad,selectJudgePattern, g_judgenumber, borderGameClick, BorderJust, BorderNear, BorderMiss);
-			break;
-
+	for (int i = 0; i < selectNotesLen; i++) {
+		if (Notes[i] == -1) {
+			continue;
+		}
+		float playerCenterX = (PlayerX+PlayerSizeX / 2);
+		if (playerCenterX + BorderMiss < NotesX[i] ||  NotesX[i] < playerCenterX - BorderMiss) {
+			continue;
+		}
+		int selectJudgePattern = JudgePattern[i];
+		float borderGameClick = playerCenterX - (NotesX[i]) - 10;
+		switch(selectJudgePattern){
+			case 1:
+				CheckInputUpJudge(Pad, selectJudgePattern, i, borderGameClick, BorderJust, BorderNear);
+				break;
+			case 2:
+				CheckInputRightJudge(Pad, selectJudgePattern, i, borderGameClick, BorderJust, BorderNear);
+				break;
+			case 3:
+				CheckInputDownJudge(Pad, selectJudgePattern, i, borderGameClick, BorderJust, BorderNear);
+				break;
+			case 4:
+				CheckInputLeftJudge(Pad,selectJudgePattern, i, borderGameClick, BorderJust, BorderNear);
+				break;
+		}
 	}
 
 }
